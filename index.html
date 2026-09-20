@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cycle</title>
+<meta name="description" content="A growing series of interactive explainers about hormones, ovulation, bleeding, time, and the feedback loops that make a cycle.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Cycle">
+<meta property="og:description" content="The calendar was only the beginning.">
+<meta property="og:url" content="https://rh42.github.io/cycle/">
+<!-- absolute on purpose: crawlers that resolve a relative og:image are the exception -->
+<meta property="og:image" content="https://rh42.github.io/cycle/two-bodies/og.png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1260">
+<meta property="og:image:alt" content="Ball-and-stick models of estradiol and testosterone beside the title Two bodies, one month.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://rh42.github.io/cycle/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/molecule.css">
+<link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+<main class="page">
+
+  <header class="mast">
+    <div class="tab mast-bar">
+      <span class="label">Cycle</span>
+      <span class="label">Interactive explainers</span>
+    </div>
+    <h1>The calendar was<br>only the beginning.</h1>
+  </header>
+
+  <section class="intro grid" aria-label="About the series">
+    <p class="dek">A growing series of interactive explainers about hormones, ovulation, bleeding, time, and the feedback loops that make a cycle.</p>
+    <figure class="mol" data-mol="e2">
+      <div class="mol-view" data-key="estradiol"></div>
+      <figcaption><span class="mol-name">Estradiol</span> <span class="mol-formula">C<sub>18</sub>H<sub>24</sub>O<sub>2</sub></span></figcaption>
+    </figure>
+  </section>
+
+  <section class="series grid" aria-labelledby="series-h">
+    <div class="tab series-head"><h2 id="series-h">The series</h2></div>
+    <ol class="series-list">
+      <li class="piece">
+        <a href="two-bodies/">
+          <span class="label piece-no">01</span>
+          <span class="piece-title">Two bodies, one month</span>
+          <p class="piece-note">Estrogen and testosterone in a woman and a man, drawn the way charts usually draw them, then on one shared scale. Every number traced back to the table it came from.</p>
+        </a>
+      </li>
+    </ol>
+    <p class="series-more">The next one lands when its numbers do.</p>
+  </section>
+
+  <footer class="foot">
+    <p class="label foot-note"><span>Built by <a href="https://rh42.github.io/" target="_blank" rel="noopener">rh42</a>.</span> <span>Slowly.</span> <span>Sources included.</span></p>
+  </footer>
+
+</main>
+<script type="module">
+  import { MOLS } from './data/molecules.js';
+  import { mountMolecule } from './js/molecule.js';
+  const host = document.querySelector('.mol-view'), mol = MOLS[host.dataset.key], c = mol.counts;
+  mountMolecule(host, mol, { label: `${mol.label}, a ball-and-stick model: ${c.C} carbons in four fused rings, ${c.O} oxygens, ${c.H} hydrogens. Arrow keys turn it.` });
+</script>
+<script data-goatcounter="https://cycle.goatcounter.com/count"
+        async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

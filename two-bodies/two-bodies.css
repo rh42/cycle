@@ -1,0 +1,196 @@
+
+.instrument {
+  --mol: var(--e2); margin-top: clamp(3rem, 7vw, 5rem);
+  display: grid; grid-template-columns: minmax(0, 1fr); column-gap: var(--col-gap);
+  grid-template-areas: 'controls' 'figure' 'caption' 'step' 'evidence' 'table';
+}
+.instrument[data-mol='t'] { --mol: var(--t); }
+.rail { display: contents; }
+.controls { grid-area: controls; }
+.figure { grid-area: figure; }
+.caption { grid-area: caption; }
+.step { grid-area: step; justify-self: start; }
+.evidence { grid-area: evidence; }
+.as-table { grid-area: table; }
+
+.controls {
+  display: flex; flex-wrap: wrap; align-items: end; gap: .75rem 2rem;
+  z-index: 2; background: var(--paper);
+}
+/* the picker pins only where there is room for it; scroll-padding-top must be reserved in the
+   same breath, or focus scrolling centres anything tapped inside the reserve it does not need */
+@media (min-width: 861px) and (min-height: 601px) {
+  .controls { position: sticky; top: 0; padding-bottom: .9rem; }
+  :root { scroll-padding-top: 5.5rem; }
+}
+.seg { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; }
+.seg legend { float: left; margin-right: 1rem; padding: 0; line-height: 2.4rem; }
+.seg label { cursor: pointer; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span {
+  display: inline-flex; align-items: center; gap: .5rem; height: 2.4rem; padding: 0 .9rem;
+  border: 1px solid var(--ink-3); border-radius: 2rem;
+  font: var(--f-ui); letter-spacing: var(--track-mono); color: var(--ink-2);
+  transition: background var(--t-quick), color var(--t-quick), border-color var(--t-quick);
+}
+.seg i { width: .6rem; height: .6rem; border-radius: 50%; background: var(--c); }
+.seg label:hover span { border-color: var(--ink); color: var(--ink); }
+.seg input:checked + span { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.seg input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* the reveal is a step, not a setting: one button whose label is always the next move */
+.step {
+  display: inline-flex; align-items: center; gap: .7rem; min-height: 3rem; padding: .75rem 1.4rem;
+  margin-top: 1.25rem; text-align: left; line-height: 1.3;
+  border: 1.5px solid var(--ink); border-radius: 2rem; background: var(--ink); color: var(--paper);
+  font: var(--f-ui); letter-spacing: var(--track-mono); cursor: pointer;
+  transition: background var(--t-quick), color var(--t-quick);
+}
+.step:hover { background: var(--ink-2); border-color: var(--ink-2); }
+.step .step-arrow { transition: transform var(--t-quick) var(--ease); }
+.step:hover .step-arrow { transform: translateX(.2rem); }
+.step[data-on='true'] { background: transparent; color: var(--ink); }
+.step[data-on='true']:hover { background: var(--wash); }
+.step[data-on='true'] .step-arrow { transform: rotate(180deg); }
+.step[data-on='true']:hover .step-arrow { transform: rotate(180deg) translateX(.2rem); }
+
+.figure { margin: clamp(1.25rem, 3vw, 2rem) 0 0; container-type: inline-size; overflow-anchor: none; }
+.chart { position: relative; height: clamp(22rem, 44vw, 34rem); }
+/* 620px is also the side/stack breakpoint in two-bodies.js */
+/* stacked panels: as tall as the screen allows, so the chart and the step button can meet */
+@container (width < 620px) { .chart { height: clamp(30rem, calc(100svh - 23.5rem), 40rem); } }
+.chart svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.caption {
+  margin: 1.5rem 0 0; max-width: 44rem; min-height: 3.2em;
+  font: var(--f-lede); letter-spacing: -.01em;
+}
+
+.chart .grid-line { stroke: var(--hairline); stroke-width: 1; }
+.chart .base-line { stroke: var(--ink-3); stroke-width: 1; }
+.chart .tick, .chart .xlab, .chart .sample, .chart .wval {
+  font: var(--f-mono-xs); letter-spacing: var(--track-mono); fill: var(--ink-3); font-variant-numeric: tabular-nums;
+}
+.chart .tick, .chart .wval { paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round; }
+.chart .xcap { font: var(--f-label); line-height: 1; letter-spacing: var(--track-label); text-transform: uppercase; fill: var(--ink-3); }
+.chart .title { font: var(--f-chart-title); letter-spacing: -.02em; fill: var(--ink); font-variation-settings: 'SOFT' 100; }
+.chart .note { font: var(--f-aside); fill: var(--ink-2); }
+.chart .ribbon { fill: var(--mol); fill-opacity: .12; }
+/* the raw modeled pulses, one pixel per pulse at this zoom: texture inside the ribbon, not a line */
+.chart .flux { stroke: var(--mol); stroke-width: .75; stroke-opacity: .45; fill: none; }
+.chart .curve-casing { stroke: var(--paper); stroke-width: 6; fill: none; stroke-linejoin: round; stroke-linecap: round; }
+.chart .curve { stroke: var(--mol); stroke-width: 2.5; fill: none; stroke-linejoin: round; stroke-linecap: round; }
+.chart .hollow .curve { stroke-dasharray: 1 5; stroke-width: 3; }
+.chart .dot { fill: var(--mol); stroke: var(--paper); stroke-width: 2; transition: r var(--t-quick); }
+.chart .hollow .dot { fill: var(--paper); stroke: var(--mol); stroke-width: 2.5; }
+/* an interval is a vertical stroke: solid for women, hollow (hue around paper) for men */
+.chart .whisk-outer { stroke: var(--mol); stroke-width: 5; stroke-linecap: round; }
+.chart .whisk-inner { stroke: var(--mol); stroke-width: 5; stroke-linecap: round; }
+.chart .hollow .whisk-outer { stroke-width: 6; }
+.chart .hollow .whisk-inner { stroke: var(--paper); stroke-width: 2.5; }
+.chart .span-fill { fill: var(--mol); fill-opacity: .1; }
+.chart .span-edge { stroke: var(--mol); stroke-width: 1; fill: none; }
+/* where a modeled ribbon already sits inside the measured band, the band steps back */
+.instrument[data-mol='t'] .span-fill { fill-opacity: .04; }
+.instrument[data-mol='t'] .span-edge { stroke-opacity: .5; }
+.chart .wval { fill: var(--ink); opacity: 0; transition: opacity var(--t-quick); }
+.chart .whisk.lit .wval { opacity: 1; }
+.chart .mark { cursor: pointer; outline: none; }
+.chart .mark:hover .dot, .chart .mark:focus .dot { r: 7; }
+.chart .mark:focus .focus-ring { stroke: var(--ink); }
+.chart .focus-ring { fill: none; stroke: transparent; stroke-width: 2; }
+.chart .hit { fill: transparent; }
+
+.key { list-style: none; margin: .75rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem 1.75rem; font: var(--f-mono); line-height: 1; letter-spacing: var(--track-mono); color: var(--ink-2); }
+.key li { display: inline-flex; align-items: center; gap: .5rem; }
+.key svg { width: 28px; height: 12px; overflow: visible; }
+.k-line, .k-whisk { stroke: var(--mol); stroke-width: 2.5; fill: none; stroke-linecap: round; }
+.k-whisk { stroke-width: 5; }
+.k-whisk-in { stroke: var(--paper); stroke-width: 2.5; stroke-linecap: round; }
+.k-dash { stroke-dasharray: 1 5; stroke-width: 3; }
+.k-dot { fill: var(--mol); }
+.k-ring { fill: var(--paper); stroke: var(--mol); stroke-width: 2.5; }
+.k-ribbon { fill: var(--mol); fill-opacity: .16; }
+
+.evidence { margin-top: 2.75rem; display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: .5rem 1rem; }
+.as-table { margin-top: 1rem; }
+.evidence p { margin: 0; max-width: 52rem; font: var(--f-mono); color: var(--ink-2); min-height: 6.4em; }
+@media (max-width: 860px) {
+  .evidence p { min-height: 0; }
+  /* a selected mark lifts the readout into a bottom sheet; a scroll puts it back */
+  .instrument.ev-pinned .evidence {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 3; margin: 0;
+    padding: .9rem var(--gutter) calc(.9rem + env(safe-area-inset-bottom)); background: var(--paper);
+    box-shadow: 0 -1px 0 var(--rule), 0 -12px 24px -16px rgba(0, 0, 0, .35);
+  }
+  .instrument.ev-pinned .evidence::before { display: none; }
+}
+.ev-src { white-space: nowrap; color: var(--ink); }
+
+.as-table summary { cursor: pointer; padding: .5rem 0; width: fit-content; color: var(--ink-2); }
+.table-wrap { overflow-x: auto; margin-top: .5rem; }
+caption { caption-side: top; text-align: left; padding: 0 0 .6rem; font: var(--f-mono); color: var(--ink-2); }
+table { border-collapse: collapse; font: var(--f-mono); line-height: 1.4; font-variant-numeric: tabular-nums; min-width: 34rem; }
+th, td { text-align: left; padding: .45rem 1.5rem .45rem 0; border-bottom: 1px solid var(--hairline); white-space: nowrap; }
+th { font: var(--f-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-3); border-bottom-color: var(--rule); }
+td.num { text-align: right; }
+td:nth-child(2) { white-space: normal; min-width: 16rem; }
+
+.what { margin-top: clamp(3rem, 7vw, 5rem); row-gap: 2.5rem; }
+.what-text { grid-column: span 4; }
+.what h2 { margin: 0 0 .6rem; }
+.what p { margin: 0 0 .8rem; color: var(--ink-2); max-width: 26rem; }
+.what-how { font: var(--f-mono); color: var(--ink-3); }
+.what-do { margin-top: clamp(3rem, 7vw, 5rem); row-gap: 1rem; }
+.do-head { grid-column: 1 / -1; }
+.what-do p { grid-column: span 4; margin: 0; color: var(--ink-2); max-width: 26rem; }
+.what-do .what-how { color: var(--ink-3); }
+.mol { grid-column: span 4; }
+
+.notes { margin-top: clamp(4rem, 9vw, 7rem); row-gap: 2.5rem; }
+.notes article { grid-column: span 4; --stub: var(--ink); }
+.notes h3 { margin: 0 0 .6rem; }
+.notes p { margin: 0; color: var(--ink-2); max-width: 26rem; }
+
+.sources { margin-top: clamp(4rem, 9vw, 7rem); }
+.sources h2 { margin: 0; }
+.sources ol { margin: 1rem 0 0; padding: 0 0 0 1.4rem; max-width: 56rem; font: var(--f-mono); color: var(--ink-2); }
+.sources li { padding: .35rem 0; }
+.sources li::marker { color: var(--ink-3); }
+
+@media (max-width: 860px) {
+  .dek { grid-column: 1 / -1; }
+  .notes article { grid-column: 1 / -1; }
+  .what-text, .mol, .what-do p { grid-column: 1 / -1; }
+  .mol-view { max-width: 22rem; }
+  .evidence { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  .seg legend { float: none; width: 100%; margin: 0 0 .35rem; line-height: 1.3; }
+  .seg { gap: .5rem; }
+}
+
+/* wide screens: a rail of controls and story on the left, the chart on the right, one screen tall */
+@media (min-width: 1100px) {
+  .instrument {
+    grid-template-columns: minmax(16rem, 3fr) minmax(0, 9fr);
+    grid-template-areas: 'controls figure' 'caption figure' 'step figure' 'evidence figure' 'table table';
+    align-content: start;
+  }
+  /* relative, not static: the .tab stub is an absolute child and needs this as its anchor */
+  .controls { position: relative; padding-bottom: 0; }
+  :root { scroll-padding-top: 0; }
+  .seg { flex-direction: column; align-items: start; gap: .5rem; }
+  .seg legend { float: none; margin: 0 0 .4rem; line-height: 1.3; }
+  .figure { margin-top: 0; }
+  .chart { height: clamp(20rem, 34vw, 27rem); }
+  .caption { margin-top: 2rem; max-width: none; }
+  .step { margin-top: 1.5rem; }
+  .evidence { grid-template-columns: minmax(0, 1fr); margin-top: var(--ev-nudge, 2rem); align-self: start; }
+  .evidence p { min-height: 0; }
+  .as-table { margin-top: 2rem; }
+}
+
+@media (forced-colors: active) {
+  .seg input:checked + span { background: Highlight; color: HighlightText; forced-color-adjust: none; }
+  .step { background: ButtonFace; color: ButtonText; }
+}

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two bodies, one month</title>
+<meta name="description" content="Estradiol and testosterone in women and men, drawn the usual way and then on one shared scale.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Two bodies, one month">
+<meta property="og:description" content="One month of estrogen and testosterone, in two bodies, drawn honestly.">
+<meta property="og:url" content="https://rh42.github.io/cycle/two-bodies/">
+<!-- absolute on purpose: crawlers that resolve a relative og:image are the exception -->
+<meta property="og:image" content="https://rh42.github.io/cycle/two-bodies/og.png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1260">
+<meta property="og:image:alt" content="Ball-and-stick models of estradiol and testosterone beside the title Two bodies, one month.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://rh42.github.io/cycle/two-bodies/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/molecule.css">
+<link rel="stylesheet" href="two-bodies.css">
+</head>
+<body>
+<main class="page">
+
+  <header class="mast">
+    <div class="tab mast-bar">
+      <span class="label">Cycle · 01</span>
+      <span class="label">Sources checked · September 2026</span>
+    </div>
+    <h1>Two bodies,<br>one month.</h1>
+    <div class="grid">
+      <p class="dek">Estrogen and testosterone run in every body, all month long. What differs is how much, and whether the amount moves by the hour or by the week. Here is one month of each, in a woman and in a man. First the way charts usually draw it. Then on the same scale.</p>
+    </div>
+  </header>
+
+  <section class="what grid" aria-labelledby="what-h">
+    <div class="tab what-text">
+      <h2 id="what-h">What they are</h2>
+      <p>Two small molecules. Most people know them as the female hormone and the male hormone. Both bodies make both: through the reproductive years the ovaries make most of the estradiol in her blood and the testes most of the testosterone in his, but fat, skin, brain and the adrenal glands make or convert both, in everyone.</p>
+      <p>They are nearly the same thing: four rings of carbon with an oxygen at each end. Testosterone has one extra carbon. One enzyme, aromatase, removes it and turns testosterone into estradiol. Every body that has one has the other. Estradiol is the main estrogen in a body that cycles, and the one the chart shows.</p>
+      <p class="what-how">Carbon in color, oxygen hollow, hydrogen as dots. Drag to turn. Shapes from the RCSB Protein Data Bank.</p>
+    </div>
+    <figure class="mol tab" data-mol="e2">
+      <div class="mol-view" data-key="estradiol"></div>
+      <figcaption><span class="mol-name">Estradiol</span> <span class="mol-formula">C<sub>18</sub>H<sub>24</sub>O<sub>2</sub></span></figcaption>
+    </figure>
+    <figure class="mol tab" data-mol="t">
+      <div class="mol-view" data-key="testosterone"></div>
+      <figcaption><span class="mol-name">Testosterone</span> <span class="mol-formula">C<sub>19</sub>H<sub>28</sub>O<sub>2</sub></span></figcaption>
+    </figure>
+  </section>
+
+  <section class="what-do grid" aria-labelledby="do-h">
+    <div class="tab do-head"><h2 id="do-h">What they do</h2></div>
+    <p>What they do overlaps. Estradiol builds the lining of the uterus and drives the monthly cycle. It also keeps skin supple, and it keeps bone dense and blood vessels flexible in men as well. Testosterone contributes to muscle, bone, body hair and desire, in women as well.</p>
+    <p>Do they run your mood? For most people, not much. Across 47 studies that tracked people day by day the findings do not line up: about one in seven found the premenstrual link people expect, and more than twice as many found no link to any phase at all. For about three in a hundred, fewer by the strictest count and more by looser ones, the ordinary rise and fall reliably triggers severe symptoms. Their hormone levels are not unusual, but their brains are more sensitive to the change.</p>
+    <p class="what-how">Mood: Romans 2012, Schmidt 1998, Reilly 2024. Bone, muscle and fat: Finkelstein 2013 and 2016. Skin: Son 2005. Desire: Maseroli 2022. All in the sources.</p>
+  </section>
+
+  <section class="instrument" aria-labelledby="inst-h">
+    <h2 id="inst-h" class="sr-only">The chart</h2>
+
+    <div class="rail">
+      <div class="tab controls">
+        <fieldset class="seg">
+          <legend class="label">Hormone</legend>
+          <label><input type="radio" name="mol" value="e2" autocomplete="off" checked><span><i style="--c:var(--e2)"></i>Estrogen</span></label>
+          <label><input type="radio" name="mol" value="t" autocomplete="off"><span><i style="--c:var(--t)"></i>Testosterone</span></label>
+        </fieldset>
+      </div>
+      <p id="caption" class="caption" aria-live="polite"></p>
+      <button type="button" class="step" id="align"><span class="step-text">Now put them on the same scale</span> <span class="step-arrow" aria-hidden="true">→</span></button>
+      <div class="tab evidence">
+        <span class="label">Evidence</span>
+        <p id="evidence"><span class="ev-text"></span> <a class="ev-src" target="_blank" rel="noopener" hidden>source ↗</a></p>
+      </div>
+    </div>
+
+    <figure class="figure tab" aria-describedby="caption">
+      <div class="chart" id="chart"></div>
+      <ul class="key" aria-label="How to read the marks">
+        <li><svg viewBox="0 0 28 12" aria-hidden="true"><path class="k-line" d="M1 9C8 9 9 2 14 2s6 7 13 7"/></svg>women</li>
+        <li><svg viewBox="0 0 28 12" aria-hidden="true"><path class="k-line k-dash" d="M1 9C8 9 9 2 14 2s6 7 13 7"/></svg>men</li>
+        <li><svg viewBox="0 0 28 12" aria-hidden="true"><circle class="k-dot" cx="8" cy="6" r="4.5"/><circle class="k-ring" cx="20" cy="6" r="4.5"/></svg>middle value, measured</li>
+        <li><svg viewBox="0 0 28 12" aria-hidden="true"><path class="k-whisk" d="M8 1v10"/><path class="k-whisk" d="M20 1v10"/><path class="k-whisk-in" d="M20 1v10"/></svg>where at least 95 in 100 people land</li>
+        <li><svg viewBox="0 0 28 12" aria-hidden="true"><path class="k-ribbon" d="M1 3h26v6H1z"/><path class="k-line" d="M1 6h26"/></svg>estimated shape · daily swing</li>
+      </ul>
+      <p id="chart-help" class="sr-only">Arrow keys move between the measured marks. Escape clears the selection.</p>
+    </figure>
+
+    <details class="as-table">
+      <summary class="label">Read it as a table</summary>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Chart data as a table"><table id="table"></table></div>
+    </details>
+  </section>
+
+  <section class="notes grid" aria-label="What the chart shows">
+    <article class="tab">
+      <h3>Neither one is flat</h3>
+      <p>His testosterone usually drops by about a third between morning and evening, then rebuilds overnight. Hers moves in the day too, but her big change takes a week, not an evening. Same machinery. Only one of them has a month.</p>
+    </article>
+    <article class="tab">
+      <h3>One hormone is half the story</h3>
+      <p>In estrogen, his whole range fits under her peak-day floor. In morning testosterone, hers fits under his. A chart that shows only one hormone has already chosen a side.</p>
+    </article>
+    <article class="tab">
+      <h3>Dots are blood, curves are guesses</h3>
+      <p>Ranges and dots are measurements from named studies. Curves are models, drawn through group medians or generated from published rhythm and pulse figures. They show a typical shape. Every range on this page describes a group, not you.</p>
+    </article>
+  </section>
+
+  <section class="sources" aria-labelledby="src-h">
+    <div class="tab"><h2 id="src-h" class="label">Sources</h2></div>
+    <ol id="sources"></ol>
+  </section>
+
+  <footer class="foot">
+    <p class="label foot-note"><span>Not medical advice.</span></p>
+    <p class="label foot-note"><span>Built by <a href="https://rh42.github.io/" target="_blank" rel="noopener">rh42</a>.</span> <span>No new blood was drawn</span> <span>in the making of this page.</span></p>
+  </footer>
+
+</main>
+<script type="module" src="two-bodies.js"></script>
+<script type="module" src="molecules.js"></script>
+<script data-goatcounter="https://cycle.goatcounter.com/count"
+        async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

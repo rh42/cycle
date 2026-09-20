@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="t">
+  <title id="t">Two rhythms, one line</title>
+  <path d="M8 34Q20 6 32 34" fill="none" stroke="#14958A" stroke-width="11" stroke-linecap="round"/>
+  <path d="M32 34Q38 52 44 34T56 34" fill="none" stroke="#AF8517" stroke-width="11" stroke-linecap="round"/>
+</svg>

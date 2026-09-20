@@ -1,0 +1,20 @@
+/* the ball-and-stick figure: mounted by js/molecule.js, styled from the page's own tokens.
+   Shared, so any page that mounts a molecule links this and nothing else. */
+.mol { margin: 0; --mol: var(--e2); --stub: var(--mol); }
+.mol[data-mol='t'] { --mol: var(--t); }
+.mol-view { aspect-ratio: 1; margin-top: .5rem; }
+.mol-view svg { display: block; width: 100%; height: 100%; overflow: visible; cursor: grab; touch-action: pan-y; outline: none; }
+.mol-view svg.grabbing { cursor: grabbing; }
+.mol-view svg:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 4px; }
+.mol .bond { stroke: var(--mol); stroke-width: 2.5; stroke-linecap: round; }
+.mol .bond-h { stroke: var(--ink-3); stroke-width: 1; }
+.mol .atom-c { fill: var(--mol); }
+.mol .atom-o { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
+.mol .atom-h { fill: var(--ink-3); }
+.mol .atom-extra { stroke: var(--ink); stroke-width: 2; }
+.mol .tag-lead { stroke: var(--ink); stroke-width: 1; }
+.mol .tag-text { font: var(--f-aside); fill: var(--ink); paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round; }
+.mol figcaption { margin-top: .5rem; font: var(--f-mono); letter-spacing: var(--track-mono); color: var(--ink-2); }
+.mol-name { color: var(--ink); font-weight: 500; }
+.mol-formula { margin-left: .6rem; }
+.mol-formula sub { font-size: .8em; }

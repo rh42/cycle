@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Out of phase · Cycle</title>
+<meta name="robots" content="noindex">
+<!-- THE ONE FILE WITH THE REPO PATH BAKED IN. GitHub Pages serves this for any missing path
+     under the site, at any depth, so document-relative hrefs would resolve against the path
+     that does not exist and 404 in turn. Absolute is the only thing that survives.
+     On a custom domain at the root, drop the /cycle prefix here and from the two links below.
+     Consequence for local work: this page is only correct when the site is served AT /cycle/,
+     so serve the PARENT directory (python3 -m http.server from ../) and open
+     http://localhost:PORT/cycle/404.html. Served from the repo root, its stylesheets 404. -->
+<link rel="icon" href="/cycle/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/cycle/css/tokens.css">
+<link rel="stylesheet" href="/cycle/css/base.css">
+<style>
+  /* the whole page is one block, so it gets its own few lines rather than a stylesheet */
+  /* one column, not the 12-column .grid: nothing here needs to line up with anything */
+  .lost { min-height: 68svh; display: flex; flex-direction: column; justify-content: center; }
+  .lost-back { align-self: start; margin-top: clamp(1.5rem, 3vw, 2.25rem); font: var(--f-ui); letter-spacing: var(--track-mono); }
+  .lost-back span { display: inline-block; transition: transform var(--t-quick) var(--ease); }
+  .lost-back:hover span { transform: translateX(.25rem); }
+</style>
+</head>
+<body>
+<main class="page">
+
+  <header class="mast">
+    <div class="tab mast-bar">
+      <span class="label"><a href="/cycle/">Cycle</a></span>
+      <span class="label">404</span>
+    </div>
+  </header>
+
+  <section class="lost">
+    <h1>Out of phase.</h1>
+    <p class="dek">We checked the hypothalamus, the pituitary, and the server. Nothing came back.</p>
+    <a class="lost-back" href="/cycle/">Back to the series <span aria-hidden="true">&rarr;</span></a>
+  </section>
+
+  <footer class="foot">
+    <p class="label foot-note"><span>Not every missing page is late.</span> <span>This one simply is not here.</span></p>
+  </footer>
+
+</main>
+<script>
+  // without this every missing URL is logged as though it were a page that exists
+  window.goatcounter = { path: (p) => '404: ' + p };
+</script>
+<script data-goatcounter="https://cycle.goatcounter.com/count"
+        async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>
