@@ -64,7 +64,7 @@
   import { MOLS } from './data/molecules.js';
   import { mountMolecule } from './js/molecule.js';
   const host = document.querySelector('.mol-view'), mol = MOLS[host.dataset.key], c = mol.counts;
-  mountMolecule(host, mol, { label: `${mol.label}, a ball-and-stick model: ${c.C} carbons in four fused rings, ${c.O} oxygens, ${c.H} hydrogens. Arrow keys turn it.` });
+  mountMolecule(host, mol, { label: `${mol.label}, a ball-and-stick model: four fused rings, ${c.C} carbons, ${c.O} oxygens, ${c.H} hydrogens. Arrow keys turn it.` });
 </script>
 <script data-goatcounter="https://cycle.goatcounter.com/count"
         async src="https://gc.zgo.at/count.js"></script>

@@ -1,0 +1,185 @@
+/* The stage is the whole screen. Time scrolls left past the now line; the organs stand on that
+   line, top to bottom in the order the signal travels. Right of it is empty future. */
+.stage {
+  --now: 56%;
+  --lining: #B9747B; --blood: #8E1B2C;
+  position: relative; height: 100svh; min-height: 36rem; overflow: hidden;
+  user-select: none; -webkit-user-select: none; touch-action: none; cursor: default;
+}
+@media (prefers-color-scheme: dark) { .stage { --lining: #B9747B; --blood: #D0445A; } }
+.plot { position: absolute; inset: 0; }
+.plot svg { display: block; width: 100%; height: 100%; }
+
+.plot .area { stroke: none; fill-opacity: .2; }
+.plot .area.lining { fill-opacity: .55; }
+.plot .edge { fill: none; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.e2 { --c: var(--e2); } .lh { --c: var(--lh); } .p4 { --c: var(--p4); } .lining { --c: var(--lining); } .blood { --c: var(--blood); } .hcg { --c: var(--ink); }
+.plot .area { fill: var(--c); }
+.plot .edge { stroke: var(--c); }
+.plot .dot { fill: var(--c); stroke: none; }
+.plot .now { stroke: var(--ink); stroke-width: 1; }
+/* progesterone at zero would otherwise draw a purple line along the floor all month */
+.plot .floor-mask { stroke: var(--paper); stroke-width: 4; }
+.plot .floor { stroke: var(--rule); stroke-width: 1; }
+.plot .ticks { fill: none; stroke: var(--ink-3); stroke-width: 1; }
+.plot .day { font: var(--f-mono-xs); letter-spacing: var(--track-mono); fill: var(--ink-3); text-anchor: middle; }
+.plot .mark line { stroke: var(--ink); stroke-width: 1; }
+.plot .mark text { font: var(--f-mono); letter-spacing: var(--track-mono); fill: var(--ink); text-anchor: end; paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round; }
+.plot .mark.big text { font: var(--f-ui); }
+.plot .name { font: var(--f-label); letter-spacing: var(--track-label); text-transform: uppercase; fill: var(--ink-2); text-anchor: end; paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round; }
+.plot .swatch { fill: var(--c); stroke: var(--paper); stroke-width: 2; paint-order: stroke; }
+.plot .ripple { fill: none; stroke: var(--lh); stroke-width: 2; opacity: 0; }
+
+.pit, .ov {
+  position: absolute; left: var(--now);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2rem;
+  border-radius: 50%; background: var(--paper); text-align: center;
+}
+.organ-name { font: var(--f-ui); letter-spacing: var(--track-mono); color: var(--ink); line-height: 1.15; }
+.organ-state { font: var(--f-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-3); }
+
+.pit { top: 1.25rem; width: 7rem; height: 7rem; translate: -50% 0; border: 1.5px solid var(--ink-3); transition: background var(--t-scene), border-color var(--t-quick); }
+.pit[data-state='braking'] { border-color: var(--e2); }
+.pit[data-state='firing'] { background: color-mix(in oklab, var(--lh) 22%, var(--paper)); border-color: var(--lh); }
+
+/* --d and --k are set from the model: size, and how much of its hormone the organ is sending */
+.ov {
+  --hue: var(--e2);
+  top: 52%; translate: -50% -50%; width: calc(var(--d, 5) * 1rem); height: calc(var(--d, 5) * 1rem);
+  border: 1.5px solid var(--hue);
+  background: color-mix(in oklab, var(--hue) calc(var(--k, 0) * 35%), var(--paper));
+  transition: scale var(--t-quick) var(--ease), box-shadow var(--t-quick), border-color var(--t-scene);
+}
+.ov[data-hold='true'] { scale: 1.06; box-shadow: 0 0 0 8px color-mix(in oklab, var(--e2) 25%, transparent); }
+.ov[data-state='empty'] { --hue: var(--p4); border-style: dashed; }
+.egg {
+  position: absolute; left: 50%; top: 100%; width: 1.1rem; height: 1.1rem; margin: -1.45rem 0 0 -.55rem;
+  border: 1.5px solid var(--ink); border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--paper) 0 22%, transparent 55%), color-mix(in oklab, var(--ink) 10%, var(--paper));
+}
+.egg::after {
+  content: 'egg'; position: absolute; left: 50%; top: calc(100% + .55rem); translate: -50% 0;
+  font: var(--f-mono); letter-spacing: var(--track-mono); color: var(--ink); text-shadow: 0 0 3px var(--paper), 0 0 3px var(--paper);
+}
+.ov[data-state='empty'] .egg { translate: 0 14rem; opacity: 0; margin-top: .3rem; transition: translate 4s linear, opacity 1.2s ease-in 2.8s; }
+.ov[data-state='spent'] .egg, .ov[data-embryo='true'] .egg { display: none; }
+.plot .embryo .shell { fill: color-mix(in oklab, var(--ink) 8%, var(--paper)); stroke: var(--ink); stroke-width: 1.5; }
+.plot .embryo .cell { fill: var(--paper); stroke: var(--ink); stroke-width: 1; }
+.plot .embryo-name { text-anchor: start; }
+
+.future {
+  position: absolute; left: var(--now); right: 0; top: 0; bottom: 0;
+  display: flex; flex-direction: column; padding: 1.75rem clamp(1.5rem, 4vw, 4rem) 1.75rem clamp(5.5rem, 7vw, 7rem);
+}
+.slot { min-height: 8.5rem; }
+.chain { list-style: none; margin: 0; padding: 0; font: var(--f-body); color: var(--ink-3); }
+.chain li { position: relative; padding-left: 1.1rem; transition: color var(--t-quick); }
+.chain li::before { content: ''; position: absolute; left: 0; top: .48em; width: .55rem; height: .55rem; border-radius: 50%; background: var(--c); opacity: .3; transition: opacity var(--t-quick); }
+.chain li.done { color: var(--ink-2); }
+.chain li.done::before { opacity: .7; }
+.chain li.now { color: var(--ink); }
+.chain li.now::before { opacity: 1; }
+.chain .egg-c { --c: var(--ink); }
+
+.bars { display: none; }
+.future[data-mode='summary'] .chain { display: none; }
+.future[data-mode='summary'] .bars { display: block; }
+.bars-head { display: flex; gap: 1rem; margin: 0 0 .5rem; }
+.bars-head i { font-style: normal; }
+.bars-head i::before { content: ''; display: inline-block; width: .55rem; height: .55rem; border-radius: 50%; margin-right: .4rem; background: var(--c); }
+.bar { display: flex; align-items: center; height: 1.15rem; margin-bottom: .3rem; font: var(--f-mono-xs); color: var(--ink-2); letter-spacing: var(--track-mono); }
+.bar span { display: block; height: .75rem; background: var(--c); }
+.bar .none { background: repeating-linear-gradient(135deg, var(--lining) 0 3px, transparent 3px 7px); }
+.bar b { font-weight: 400; margin-left: .6rem; white-space: nowrap; }
+
+.count { display: flex; align-items: flex-end; gap: 1rem; margin: auto 0 0; }
+.count-num { font: var(--f-h1); font-variation-settings: 'SOFT' 100; letter-spacing: -.035em; font-variant-numeric: tabular-nums; color: var(--ink); transition: color var(--t-quick); }
+.count-unit { padding-bottom: .55rem; max-width: 7rem; }
+.count-unit span { display: block; }
+.count-unit span + span { margin-top: .3rem; color: var(--ink-2); }
+.count[data-state='fading'] .count-num { color: var(--ink-3); }
+.count[data-state='fired'] .count-num { color: var(--lh); }
+.count[data-state='luteal'] .count-num { color: var(--p4); }
+.count[data-state='shed'] .count-num { color: var(--blood); }
+.say { margin: 1.1rem 0 auto; font: var(--f-lede); max-width: 28rem; min-height: 5.6em; transition: opacity 180ms; }
+.say.swap { opacity: 0; }
+
+.controls { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+.key {
+  display: inline-flex; align-items: center; justify-content: center; width: 15rem; height: 3rem;
+  border: 1.5px solid var(--ink); border-bottom-width: 5px; border-radius: .6rem; background: var(--paper);
+  font: var(--f-ui); letter-spacing: var(--track-mono); color: var(--ink);
+  transition: translate 60ms, border-bottom-width 60ms, background var(--t-quick), color var(--t-quick), opacity var(--t-quick);
+}
+.key.down { translate: 0 3px; border-bottom-width: 2px; }
+.key.live { background: var(--e2); color: var(--paper); }
+.key.idle { opacity: .4; }
+.key.invite { background: var(--ink); color: var(--paper); }
+.key.nope { animation: nope 320ms var(--ease); }
+@keyframes nope { 20% { transform: translateX(-7px); } 45% { transform: translateX(6px); } 70% { transform: translateX(-3px); } }
+.reset {
+  padding: .35rem 0; background: none; border: 0; cursor: pointer;
+  font: var(--f-mono); letter-spacing: var(--track-mono); color: var(--ink-2);
+  text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: .18em;
+}
+.reset:hover { color: var(--ink); text-decoration-color: currentColor; }
+.reset[hidden] { display: none; }
+.speed { margin: .8rem 0 0; }
+
+.stage.jolt { animation: jolt 380ms var(--ease); }
+@keyframes jolt { 15% { transform: translateY(5px); } 40% { transform: translateY(-3px); } 70% { transform: translateY(1px); } }
+
+.skip { position: absolute; top: .75rem; left: .75rem; z-index: 5; padding: .5rem .75rem; background: var(--ink); color: var(--paper); font: var(--f-mono); translate: 0 -200%; }
+.skip:focus { translate: 0 0; }
+
+.words { margin-top: clamp(4rem, 9vw, 7rem); scroll-margin-top: 1.5rem; }
+.words h2 { margin: 0; }
+.words-grid { margin-top: 2rem; row-gap: 2.5rem; }
+.words-grid article { grid-column: span 6; }
+.words-grid h3 { margin: 0 0 .6rem; }
+.words-grid p { margin: 0 0 .75rem; color: var(--ink-2); max-width: 36rem; }
+
+.cast { margin-top: clamp(4rem, 9vw, 7rem); }
+.cast h2 { margin: 0; }
+.cast-lede { max-width: 46rem; margin: 1rem 0 0; font: var(--f-lede); }
+.cast-small { margin-top: 1.5rem; row-gap: 1.5rem; align-items: center; }
+.cast-small .mol { grid-column: span 3; }
+.cast-small .cast-text { grid-column: span 3; margin: 0; color: var(--ink-2); }
+.mol[data-mol='p4'] { --mol: var(--p4); }
+.cast-how { margin: 1rem 0 0; font: var(--f-mono); letter-spacing: var(--track-mono); color: var(--ink-2); }
+.cast-lede.proteins { margin-top: 3rem; }
+.cast-big { margin-top: 1.5rem; row-gap: 1.5rem; }
+.cast-big article { grid-column: span 4; }
+.cast-big h3 { position: relative; margin: 0 0 .4rem; padding-left: 1.1rem; }
+.cast-big h3::before { content: ''; position: absolute; left: 0; top: .5em; width: .6rem; height: .6rem; border-radius: 50%; background: var(--c); }
+.cast-big p { margin: 0; color: var(--ink-2); }
+.cast-big [data-c='lh'] { --c: var(--lh); }
+.cast-big [data-c='fsh'] { --c: var(--fsh); }
+.cast-big [data-c='hcg'] { --c: var(--ink); }
+
+.notes { margin-top: clamp(4rem, 9vw, 7rem); row-gap: 2.5rem; }
+.notes article { grid-column: span 4; }
+.notes h3 { margin: 0 0 .6rem; }
+.notes p { margin: 0; color: var(--ink-2); }
+.sources { margin-top: clamp(4rem, 9vw, 7rem); }
+.sources h2 { margin: 0; }
+.sources ol { margin: 1rem 0 0; padding: 0 0 0 1.4rem; max-width: 56rem; font: var(--f-mono); color: var(--ink-2); }
+.sources li { padding: .35rem 0; }
+.sources li::marker { color: var(--ink-3); }
+.sources a { white-space: nowrap; color: var(--ink); }
+
+/* this version is built for a keyboard and a wide screen */
+.narrow { display: none; }
+@media (max-width: 819px) {
+  .stage { display: none; }
+  .narrow { display: block; margin: 3rem 0 0; font: var(--f-lede); }
+  .notes article, .cast-big article, .words-grid article { grid-column: 1 / -1; }
+  .cast-small .mol, .cast-small .cast-text { grid-column: span 6; }
+}
+@media (min-width: 820px) and (max-width: 1100px) { .notes article { grid-column: span 6; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .plot .dot, .plot .swatch { fill: var(--c); stroke: var(--paper); stroke-width: 2; paint-order: stroke; }
+.plot .ripple { display: none; }
+  .stage.jolt, .key.nope { animation: none; }
+}

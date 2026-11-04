@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One cycle</title>
+<meta name="description" content="Hold the space bar and run a menstrual cycle: estradiol, the LH surge, ovulation, progesterone, and the bleed that follows about two weeks later.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../css/tokens.css?v=2">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/molecule.css">
+<link rel="stylesheet" href="loop.css?v=8">
+</head>
+<body>
+<noscript>
+  <div style="max-width:62ch;margin:3rem auto;padding:0 1.5rem;font:400 16px/1.65 Georgia,serif">
+    <h1>One cycle</h1>
+    <p>A follicle makes estradiol, which rebuilds the lining and holds the pituitary back. Held up for about two and a half days, the same hormone flips the pituitary into an LH surge, and the surge releases the egg. The empty follicle then makes progesterone for about two weeks. When progesterone falls, the lining sheds. That is the bleed. If an embryo implants, it makes hCG, which keeps the empty follicle going, so progesterone holds up and there is no bleed.</p>
+    <p><em>This page is interactive and needs JavaScript to draw itself. The summary above is the whole idea.</em></p>
+  </div>
+</noscript>
+
+<main>
+  <a class="skip" href="#words">Skip the game and read the cycle in words</a>
+  <section class="stage" id="stage" aria-labelledby="st-h">
+    <h1 id="st-h" class="sr-only">One cycle</h1>
+    <div class="plot" id="plot" aria-hidden="true"></div>
+
+    <div class="pit" id="pit" data-state="quiet" aria-hidden="true">
+      <span class="organ-name">Pituitary</span>
+      <span class="organ-state" id="pit-state">listening</span>
+    </div>
+    <div class="ov" id="ov" data-state="follicle" aria-hidden="true">
+      <span class="organ-name" id="ov-name">Follicle</span>
+      <span class="egg"></span>
+    </div>
+
+    <div class="future" id="future">
+      <div class="slot">
+        <ol class="chain" id="chain">
+          <li data-c="e2">Estradiol rebuilds the lining and brakes LH.</li>
+          <li data-c="lh">Held up long enough, it fires an LH surge.</li>
+          <li data-c="egg-c">The surge releases the egg.</li>
+          <li data-c="p4">The empty follicle makes progesterone.</li>
+          <li data-c="blood">When progesterone falls, the lining sheds.</li>
+        </ol>
+        <div class="bars" id="bars"></div>
+      </div>
+      <p class="count" id="count-wrap"><span class="count-num" id="count">1</span><span class="label count-unit"><span id="count-unit">day of this cycle</span><span id="count-sub"></span></span></p>
+      <p class="say" id="say" aria-live="polite">This is day 1, the day bleeding starts. Calendars count from here. The story started two weeks ago. Tap space to start the clock.</p>
+      <div class="controls">
+        <kbd class="key" id="key">space</kbd>
+        <button type="button" class="reset" id="reset" hidden>Start over</button>
+      </div>
+      <p class="label speed" id="speed"></p>
+    </div>
+  </section>
+
+  <div class="page">
+    <p class="narrow">This version is built for a keyboard and a wide screen. Open it on a laptop to hold the space bar.</p>
+    <section class="words" id="words" aria-labelledby="words-h">
+      <div class="tab"><h2 id="words-h" class="label">The cycle in words</h2></div>
+      <p class="cast-lede">This is the same story the game tells, for anyone using a screen reader or a phone. If you play with a screen reader, the captions are announced as they change.</p>
+      <div class="words-grid grid">
+        <article>
+          <h3>The first half</h3>
+          <p>Day 1 is the day bleeding starts, and calendars count from there. The old lining leaves over about four days. Estradiol and progesterone are low, so the pituitary, a gland at the base of the brain, sends out FSH. Follicles in the ovary start to grow, and one pulls ahead.</p>
+          <p>That follicle makes estradiol, which rebuilds the lining and holds the pituitary's LH back. Kept up for about two and a half days, the same estradiol flips it into a surge. Roughly a day and a half after the surge begins, the follicle opens and the egg comes out. That is ovulation.</p>
+          <p>This half can stretch. On average it runs from about 10 days in very short cycles to about 27 in long ones.</p>
+        </article>
+        <article>
+          <h3>The second half</h3>
+          <p>The empty follicle stays behind and makes progesterone, which stops the lining growing and gets it ready. This half usually lasts around 11 to 14 days and moves much less than the first.</p>
+          <p>Without a pregnancy, the empty follicle winds down. Exactly what ends it is still unknown. Progesterone falls, and the fall tells the lining to let go. The lining shrinks a little and then sheds, and the next day 1 begins.</p>
+          <p>So a late period usually means a late egg, and that was mostly decided about two weeks before anyone noticed.</p>
+        </article>
+        <article>
+          <h3>If no egg comes out</h3>
+          <p>Some cycles release no egg and still end in a bleed. In women with regular cycles, that bleed can come at about the usual time, so a period on its own does not prove an egg was released. How the lining breaks down in these cycles is less understood.</p>
+        </article>
+        <article>
+          <h3>If an embryo implants</h3>
+          <p>An egg lasts a day at most. If sperm reaches it, the embryo divides as it drifts toward the lining, and usually settles in 8 to 10 days after the egg came out. There it starts making hCG, the hormone a pregnancy test looks for.</p>
+          <p>hCG reaches the empty follicle and keeps it going, so progesterone holds up and the bleed that was due does not come. Not every embryo implants, and some that do are lost early, often before anyone knows.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="cast" aria-labelledby="cast-h">
+      <div class="tab"><h2 id="cast-h" class="label">The hormones</h2></div>
+      <p class="cast-lede">The chart draws them all as lines, but they are two different kinds of thing. Estradiol and progesterone are small molecules: four rings of carbon with an oxygen at each end. Progesterone has three more carbons.</p>
+      <div class="cast-small grid">
+        <figure class="mol" data-mol="e2">
+          <div class="mol-view" data-key="estradiol"></div>
+          <figcaption><span class="mol-name">Estradiol</span> <span class="mol-formula">C<sub>18</sub>H<sub>24</sub>O<sub>2</sub></span></figcaption>
+        </figure>
+        <p class="cast-text">Made by the growing follicle. It rebuilds the lining and brakes LH until, held up long enough, it flips the pituitary into a surge.</p>
+        <figure class="mol" data-mol="p4">
+          <div class="mol-view" data-key="progesterone"></div>
+          <figcaption><span class="mol-name">Progesterone</span> <span class="mol-formula">C<sub>21</sub>H<sub>30</sub>O<sub>2</sub></span></figcaption>
+        </figure>
+        <p class="cast-text">Made by the empty follicle after the egg leaves. It stops the lining growing and readies it. When it falls, the lining sheds.</p>
+      </div>
+      <p class="cast-how">Carbon in color, oxygen hollow, hydrogen as dots. Drag to turn. Shapes from the RCSB Protein Data Bank.</p>
+      <p class="cast-lede proteins">LH, FSH and hCG are proteins, far too large to draw this way: two chains, 203 to 237 amino acids in all. All three share the first chain. The second decides which hormone it is.</p>
+      <div class="cast-big grid">
+        <article data-c="lh"><h3>Luteinizing hormone (LH)</h3><p>From the pituitary. Its surge releases the egg, and it keeps the empty follicle running afterward.</p></article>
+        <article data-c="fsh"><h3>Follicle-stimulating hormone (FSH)</h3><p>From the pituitary. It gets follicles growing early in the cycle. The chart leaves it out.</p></article>
+        <article data-c="hcg"><h3>Human chorionic gonadotropin (hCG)</h3><p>From the embryo once it implants. Its second chain is about 80% the same as LH's, and it works LH's receptor on the empty follicle. That is how it stops the clock.</p></article>
+      </div>
+    </section>
+
+    <section class="notes grid" aria-label="What the cycle shows">
+      <article class="tab">
+        <h3>The fall is the signal</h3>
+        <p>After an egg, a period is caused mainly by progesterone falling. Estrogen falls too, but that is not the cause. Block progesterone's receptor in the second half of the cycle and bleeding starts within days, even while progesterone is still high in the blood.</p>
+      </article>
+      <article class="tab">
+        <h3>A late period is mostly a late egg</h3>
+        <p>Most of the slack sits in the first half. Across cycle lengths its average runs from 10.4 to 26.8 days against the second half's 8.0 to 12.9, and in cycles of 25 days or more, about nine in ten, the second half stays between 12.4 and 12.9. It is not rigid: averages run about 11 to 14 days depending on how they are measured, within one person they move by a day or two, and some run much shorter. The game draws 12 to 14.</p>
+      </article>
+      <article class="tab">
+        <h3>A bleed does not prove an egg</h3>
+        <p>In one study of women selected for regular cycles, cycles with no ovulation had a median length of 29 days against 28 for ovulatory ones, though they ranged from 20 to 37. In midlife they tend to run longer and vary far more. The game picks a day from 26 to 34. Some follicles even make progesterone without releasing an egg. Bleeding without progesterone is a different event, and a 2002 review of abnormal bleeding called it very poorly understood.</p>
+      </article>
+      <article class="tab">
+        <h3>The one signal that stops the clock</h3>
+        <p>If an embryo implants, usually 8 to 10 days after the egg, it makes hCG. That keeps the empty follicle alive, so progesterone holds up and the lining is not told to let go. Not every embryo implants. Without hCG nothing changes the clock, so the bleed is expected at its usual time. Some that do implant are lost early, often before anyone knows.</p>
+      </article>
+      <article class="tab">
+        <h3>Time, as well as level</h3>
+        <p>In 1975 Keye and Jaffe gave women estradiol injections that kept blood levels similar and varied only how long, then tested the pituitary with a dose of GnRH. At 36 hours its LH response had all but vanished. At 60 it was bigger than usual. Two women at each time point, ten in all across the study. No surge came on its own in this experiment, even at 132 hours. Liu and Yen got one at about 58 hours, with estradiol rising in steps. The game combines the two: it holds estradiol flat and fires at 60.</p>
+      </article>
+    </section>
+
+    <section class="sources" aria-labelledby="src-h">
+      <div class="tab"><h2 id="src-h" class="label">Sources</h2></div>
+      <ol>
+        <li>Keye WR Jr, Jaffe RB. Strength-duration characteristics of estrogen effects on gonadotropin response to gonadotropin-releasing hormone in women. I. Effects of varying duration of estradiol administration. J Clin Endocrinol Metab 1975;41:1003–8. <a href="https://pubmed.ncbi.nlm.nih.gov/1107343/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Liu JH, Yen SSC. Induction of midcycle gonadotropin surge by ovarian steroids in women: a critical evaluation. J Clin Endocrinol Metab 1983;57:797–802. <a href="https://pubmed.ncbi.nlm.nih.gov/6411754/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Hoff JD, Quigley ME, Yen SSC. Hormonal dynamics at midcycle: a reevaluation. J Clin Endocrinol Metab 1983;57:792–6. Estradiol peaks as the surge begins, in five women. <a href="https://pubmed.ncbi.nlm.nih.gov/6411753/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>WHO Task Force on Methods for the Determination of the Fertile Period. Temporal relationships between ovulation and defined changes in the concentration of plasma estradiol-17&beta;, luteinizing hormone, follicle-stimulating hormone, and progesterone. I. Probit analysis. Am J Obstet Gynecol 1980;138:383–90. Median 32 hours from the LH rise to ovulation. <a href="https://pubmed.ncbi.nlm.nih.gov/6775535/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Bull JR, et al. Real-world menstrual cycle characteristics of more than 600,000 menstrual cycles. npj Digit Med 2019;2:83. Phase lengths by cycle length, dated by temperature. CC BY 4.0. <a href="https://pubmed.ncbi.nlm.nih.gov/31482137/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Lenton EA, Landgren BM, Sexton L. Normal variation in the length of the luteal phase of the menstrual cycle: identification of the short luteal phase. Br J Obstet Gynaecol 1984;91:685–9. Luteal length by LH peak. <a href="https://pubmed.ncbi.nlm.nih.gov/6743610/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Jain V, Chodankar RR, Maybin JA, Critchley HOD. Uterine bleeding: how understanding endometrial physiology underpins menstrual health. Nat Rev Endocrinol 2022;18:290–308. Progesterone withdrawal as the cause of menstruation. <a href="https://pubmed.ncbi.nlm.nih.gov/35136207/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Croxatto HB, Salvatierra AM, Croxatto HD, Spitz IM. Variable effects of RU 486 on endometrial maintenance in the luteal phase extended by exogenous hCG. Clin Endocrinol (Oxf) 1989;31:15–23. Blocking the progesterone receptor, and hCG rescue. <a href="https://pubmed.ncbi.nlm.nih.gov/2598478/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Schaison G, et al. Effects of the antiprogesterone steroid RU 486 during midluteal phase in normal women. J Clin Endocrinol Metab 1985;61:484–9. Bleeding within days of blocking the receptor. <a href="https://pubmed.ncbi.nlm.nih.gov/2991322/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Wilcox AJ, Baird DD, Weinberg CR. Time of implantation of the conceptus and loss of pregnancy. N Engl J Med 1999;340:1796–9. <a href="https://pubmed.ncbi.nlm.nih.gov/10362823/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Wilcox AJ, et al. Incidence of early loss of pregnancy. N Engl J Med 1988;319:189–94. Losses before a pregnancy is recognized. <a href="https://pubmed.ncbi.nlm.nih.gov/3393170/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Barnhart KT, et al. Symptomatic patients with an early viable intrauterine pregnancy: HCG curves redefined. Obstet Gynecol 2004;104:50–5. How fast hCG rises in early viable pregnancy, in women with pain or bleeding. <a href="https://pubmed.ncbi.nlm.nih.gov/15229000/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Nepomnaschy PA, Weinberg CR, Wilcox AJ, Baird DD. Urinary hCG patterns during the week following implantation. Hum Reprod 2008;23:271–7. The rise is fastest at first. <a href="https://pubmed.ncbi.nlm.nih.gov/18083748/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Lenton EA, Neal LM, Sulaiman R. Plasma concentrations of human chorionic gonadotropin from the time of implantation until the second week of pregnancy. Fertil Steril 1982;37:773–8. Doubling time in blood. <a href="https://pubmed.ncbi.nlm.nih.gov/7115557/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Baird DD, Weinberg CR, McConnaughey DR, Wilcox AJ. Rescue of the corpus luteum in human pregnancy. Biol Reprod 2003;68:448–56. Progesterone around implantation. <a href="https://pubmed.ncbi.nlm.nih.gov/12533407/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Henry S, Shirin S, Goshtasebi A, Prior JC. Prospective 1-year assessment of within-woman variability of follicular and luteal phase lengths in healthy women prescreened to have normal menstrual cycle and luteal phase lengths. Hum Reprod 2024;39:2565–74. Length of anovulatory cycles, 18 among 694. <a href="https://pubmed.ncbi.nlm.nih.gov/39320898/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>O'Connor KA, et al. Progesterone and ovulation across stages of the transition to menopause. Menopause 2009;16:1178–87. Longer, more varied anovulatory cycles in midlife. <a href="https://pubmed.ncbi.nlm.nih.gov/19568209/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Kerin JF, et al. Incidence of the luteinized unruptured follicle phenomenon in cycling women. Fertil Steril 1983;40:620–6. Progesterone with no egg released. <a href="https://pubmed.ncbi.nlm.nih.gov/6628705/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Seidman LC, Brennan KM, Rapkin AJ, Payne LA. Rates of anovulation in adolescents and young adults with moderate to severe primary dysmenorrhea and those without primary dysmenorrhea. J Pediatr Adolesc Gynecol 2018;31:94–101. Regular periods with no ovulation, presumed from LH test kits. <a href="https://pubmed.ncbi.nlm.nih.gov/29017868/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Livingstone M, Fraser IS. Mechanisms of abnormal uterine bleeding. Hum Reprod Update 2002;8:60–7. Bleeding without a corpus luteum. <a href="https://pubmed.ncbi.nlm.nih.gov/11866241/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Hutchison JS, Zeleznik AJ. The corpus luteum of the primate menstrual cycle is capable of recovering from a transient withdrawal of pituitary gonadotropin support. Endocrinology 1985;117:1043–9. Rhesus macaque; the corpus luteum keeps its own clock. <a href="https://pubmed.ncbi.nlm.nih.gov/3893990/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Karsch FJ, et al. Induced LH surges in the rhesus monkey: strength-duration characteristics of the estrogen stimulus. Endocrinology 1973;92:1740–7. Rhesus macaque; the rule that the signal must stay on until the response begins is taken from here. That letting go resets the count is the game's own rule. <a href="https://pubmed.ncbi.nlm.nih.gov/4196431/" target="_blank" rel="noopener">PubMed ↗</a></li>
+        <li>Yen &amp; Jaffe's Reproductive Endocrinology, 9th edition, 2024. Chapters 10 and 11. hCG and the LH receptor; what ends a period.</li>
+        <li>UniProt P01215, P01229, P01225, P0DN86. Chain lengths and sequences of the shared chain, LH, FSH and hCG. <a href="https://www.uniprot.org/uniprotkb/P01215/entry" target="_blank" rel="noopener">UniProt ↗</a></li>
+      </ol>
+    </section>
+
+    <footer class="foot">
+      <p class="label foot-note"><span>Not medical advice.</span> <span>Curves are models, not measurements.</span></p>
+      <p class="label foot-note"><span>Built by <a href="https://rh42.github.io/" target="_blank" rel="noopener">rh42</a>.</span></p>
+    </footer>
+  </div>
+</main>
+<script type="module" src="loop.js?v=13"></script>
+<script type="module" src="cast.js?v=3"></script>
+</body>
+</html>

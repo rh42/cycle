@@ -22,6 +22,9 @@
   /* color names a molecule, never a body */
   --e2: #14958A;
   --t: #AF8517;
+  --lh: #A8341A;
+  --fsh: #255096;
+  --p4: #8A5BD0;
 
   /* three families, no more */
   --display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
@@ -71,6 +74,9 @@
     --ink-3: #8F897B;
     --e2: #098265;
     --t: #B08D3F;
+    --lh: #C23408;
+    --fsh: #4296E7;
+    --p4: #814CC8;
   }
 }
 
