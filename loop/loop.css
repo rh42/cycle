@@ -4,7 +4,7 @@
   --now: 56%;
   --lining: #B9747B; --blood: #8E1B2C;
   position: relative; height: 100svh; min-height: 36rem; overflow: hidden;
-  user-select: none; -webkit-user-select: none; touch-action: none; cursor: default;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; cursor: default;
 }
 @media (prefers-color-scheme: dark) { .stage { --lining: #B9747B; --blood: #D0445A; } }
 .plot { position: absolute; inset: 0; }
@@ -72,17 +72,11 @@
   display: flex; flex-direction: column; padding: 1.75rem clamp(1.5rem, 4vw, 4rem) 1.75rem clamp(5.5rem, 7vw, 7rem);
 }
 .slot { min-height: 8.5rem; }
-.chain { list-style: none; margin: 0; padding: 0; font: var(--f-body); color: var(--ink-3); }
-.chain li { position: relative; padding-left: 1.1rem; transition: color var(--t-quick); }
-.chain li::before { content: ''; position: absolute; left: 0; top: .48em; width: .55rem; height: .55rem; border-radius: 50%; background: var(--c); opacity: .3; transition: opacity var(--t-quick); }
-.chain li.done { color: var(--ink-2); }
-.chain li.done::before { opacity: .7; }
-.chain li.now { color: var(--ink); }
-.chain li.now::before { opacity: 1; }
-.chain .egg-c { --c: var(--ink); }
+.stage-mast { margin: 0 0 1.25rem; }
+.stage-mast p { margin: 0; }
+.stage-mast h1 { margin: .35rem 0 0; font: var(--f-chart-title); font-variation-settings: 'SOFT' 100; letter-spacing: -.015em; }
 
 .bars { display: none; }
-.future[data-mode='summary'] .chain { display: none; }
 .future[data-mode='summary'] .bars { display: block; }
 .bars-head { display: flex; gap: 1rem; margin: 0 0 .5rem; }
 .bars-head i { font-style: normal; }
@@ -107,6 +101,7 @@
 .controls { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
 .key {
   display: inline-flex; align-items: center; justify-content: center; width: 15rem; height: 3rem;
+  touch-action: none;
   border: 1.5px solid var(--ink); border-bottom-width: 5px; border-radius: .6rem; background: var(--paper);
   font: var(--f-ui); letter-spacing: var(--track-mono); color: var(--ink);
   transition: translate 60ms, border-bottom-width 60ms, background var(--t-quick), color var(--t-quick), opacity var(--t-quick);
@@ -125,6 +120,8 @@
 .reset:hover { color: var(--ink); text-decoration-color: currentColor; }
 .reset[hidden] { display: none; }
 .speed { margin: .8rem 0 0; }
+/* keeps its line while hidden, so the count and caption don't jump when it appears */
+.speed[hidden] { display: block; visibility: hidden; }
 
 .stage.jolt { animation: jolt 380ms var(--ease); }
 @keyframes jolt { 15% { transform: translateY(5px); } 40% { transform: translateY(-3px); } 70% { transform: translateY(1px); } }

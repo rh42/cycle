@@ -21,12 +21,16 @@ const BRAKE = .4;
 const SURGE = { amp: 7, center: 16, sd: 9, len: 48 };   // Hoff 1983: ~48 h for a spontaneous surge
 const LINING = { base: .1, grow: .016 };                // drawn, relative to full thickness
 
+// on a touch screen the reader holds the on-screen key, so the copy names it instead of the space bar
+const touch = matchMedia('(hover: none) and (pointer: coarse)').matches;
+const KEY = touch ? 'the key' : 'space';
+
 const LINES = {
-  idle: 'This is day 1, the day bleeding starts. Calendars count from here. The story started two weeks ago. Tap space to start the clock.',
+  idle: 'This is day 1, the day bleeding starts. Calendars count from here. The lines are hormones in the blood. Along the bottom is the lining of the womb. The story started two weeks ago.',
   shed: 'The old lining is leaving. Estradiol and progesterone are low, so the brake is off and the pituitary sends FSH.',
   grow: 'Follicles in the ovary begin to grow. One pulls ahead and starts making estradiol, which rebuilds the lining.',
   early: 'Not yet. This follicle is too small to matter.',
-  ready: 'Your turn. Hold space and this follicle keeps estradiol up.',
+  ready: `Your turn. Hold ${KEY} and this follicle keeps estradiol up.`,
   wait: 'The first half of a cycle can wait. Every day here adds a day to this cycle.',
   rising: 'Estradiol climbs. Keep holding.',
   braking: 'The pituitary lets out less LH. Estradiol is a brake.',
@@ -43,8 +47,8 @@ const LINES = {
   fall: 'Progesterone falls. That fall is the signal, and the lining lets go.',
   bleed: 'Day 1 again. This bleed was mostly set the moment the follicle fired.',
   noegg: 'A bleed with no egg behind it. Progesterone never rose, so no fall set this one off. How the lining breaks down here is less understood.',
-  offer: 'The egg is out for a day at most. Tap space to let sperm reach it.',
-  offerheld: 'The egg is out for a day at most. Let go, then tap space to let sperm reach it.',
+  offer: `The egg is out for a day at most. Tap ${KEY} to let sperm reach it.`,
+  offerheld: `The egg is out for a day at most. Let go, then tap ${KEY} to let sperm reach it.`,
   toolate: 'Too late. The egg lasts a day at most.',
   met: 'They meet. The embryo starts dividing and drifts toward the lining.',
   drift: 'The clock is still running. In a few days progesterone will start to fall.',
@@ -54,11 +58,10 @@ const LINES = {
   climbs: 'hCG keeps climbing, roughly doubling every day or two at first. It is also what a pregnancy test looks for.',
 };
 const MIN_LINE_MS = 2200;
-const LAST_LINK = { text: 'When progesterone falls, the lining sheds.', c: 'blood' };
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = (id) => document.getElementById(id);
-const n = { stage: $('stage'), plot: $('plot'), pit: $('pit'), pitState: $('pit-state'), ov: $('ov'), ovName: $('ov-name'), count: $('count'), countWrap: $('count-wrap'), unit: $('count-unit'), sub: $('count-sub'), say: $('say'), key: $('key'), reset: $('reset'), speed: $('speed'), future: $('future'), chain: $('chain'), bars: $('bars') };
+const n = { stage: $('stage'), plot: $('plot'), pit: $('pit'), pitState: $('pit-state'), ov: $('ov'), ovName: $('ov-name'), count: $('count'), countWrap: $('count-wrap'), unit: $('count-unit'), sub: $('count-sub'), say: $('say'), key: $('key'), reset: $('reset'), speed: $('speed'), future: $('future'), bars: $('bars') };
 
 const smooth = (k) => { const v = clamp01(k); return v * v * (3 - 2 * v); };
 const between = (r) => r.min + Math.random() * (r.max - r.min);
@@ -155,7 +158,6 @@ function pregnancy(d) {
   if (!S.preg.implanted && d >= IMPLANT) {
     S.preg.implanted = true;
     mark({ label: `Embryo implants · day ${day()}`, big: true, y: .25 });
-    setLastLink('hCG keeps it going, so progesterone does not fall.', 'hcg');
   }
   if (!S.preg.due && d >= S.luteal) {
     S.preg.due = true;
@@ -166,10 +168,6 @@ function pregnancy(d) {
     S.results.push({ ov: S.ovDay, len: day() - 1, preg: true });
     pause();
   }
-}
-function setLastLink(text, c) {
-  const li = n.chain.lastElementChild;
-  li.textContent = text; li.dataset.c = c;
 }
 
 function endCycle(ovDay) {
@@ -193,16 +191,16 @@ function pause() {
 
 function summaryLine() {
   const r = S.results[S.results.length - 1];
-  if (r.preg) return 'A late period, and this time not a late egg. One signal from the embryo kept the second half going. Press space to start over.';
+  if (r.preg) return `A late period, and this time not a late egg. One signal from the embryo kept the second half going. Press ${KEY} to start over.`;
   const earlier = S.results.slice(0, -1).filter((x) => x.ov !== null);
   const prev = earlier[earlier.length - 1];
-  if (r.ov === null) return `No egg this cycle, and still a bleed. In women with regular cycles it can come at about the usual time, so a period does not prove ovulation. Press space.`;
-  if (!prev) return `Egg on day ${r.ov}, bleed ${r.len + 1 - r.ov} days later. Press space. This time wait longer before you hold, and tap once the egg is out.`;
+  if (r.ov === null) return `No egg this cycle, and still a bleed. In women with regular cycles it can come at about the usual time, so a period does not prove ovulation. Press ${KEY}.`;
+  if (!prev) return `Egg on day ${r.ov}, bleed ${r.len + 1 - r.ov} days later. Press ${KEY}. This time wait longer before you hold, and tap once the egg is out.`;
   const late = r.ov - prev.ov, moved = r.len - prev.len;
   const days = (v) => `${v} day${v === 1 ? '' : 's'}`;
-  if (late >= 2 && moved >= 1) return `Egg ${days(late)} later than last time, and the bleed ${days(moved)} later. A late period mostly means a late egg, already decided about two weeks before anyone noticed. Press space.`;
-  if (late <= -2 && moved <= -1) return `Egg ${days(-late)} earlier than last time, and the bleed ${days(-moved)} earlier. The days after the egg barely moved. Press space.`;
-  return `Egg on day ${r.ov}, bleed ${r.len + 1 - r.ov} days later. The first half decides most of this. Press space, and try waiting longer before you hold.`;
+  if (late >= 2 && moved >= 1) return `Egg ${days(late)} later than last time, and the bleed ${days(moved)} later. A late period mostly means a late egg, already decided about two weeks before anyone noticed. Press ${KEY}.`;
+  if (late <= -2 && moved <= -1) return `Egg ${days(-late)} earlier than last time, and the bleed ${days(-moved)} earlier. The days after the egg barely moved. Press ${KEY}.`;
+  return `Egg on day ${r.ov}, bleed ${r.len + 1 - r.ov} days later. The first half decides most of this. Press ${KEY}, and try waiting longer before you hold.`;
 }
 
 function renderBars() {
@@ -271,14 +269,6 @@ function say(now) {
   swap = setTimeout(() => { n.say.textContent = text; n.say.classList.remove('swap'); }, reduced ? 0 : 180);
 }
 
-function chainStep() {
-  if (S.phase === 'fired') return S.h - S.onset < 20 ? 1 : 2;
-  if (S.phase === 'luteal') { const d = (S.h - S.ovH) / DAY; return d < 1 ? 2 : d < (S.preg ? IMPLANT : S.luteal - 2) ? 3 : 4; }
-  if (S.shed && S.h < S.shed.until && S.phase !== 'idle') return 4;
-  if (S.holding && S.held >= 36) return 1;
-  return 0;
-}
-
 /* ── stage ──────────────────────────────────────────────────────────────── */
 
 let scene = null;
@@ -307,7 +297,7 @@ function build() {
     dotLayer: svg('g', {}, root),
     embryo: embryoEl(root),
     ripple: svg('circle', { class: 'ripple', cx: nowX, cy: rem(4.75) }, root),
-    names: { lh: nameEl(root, 'LH', 'lh'), e2: nameEl(root, 'Estradiol', 'e2'), p4: nameEl(root, 'Progesterone', 'p4'), lin: nameEl(root, 'Lining', 'lining'), hcg: nameEl(root, 'hCG', 'hcg') },
+    names: { lh: nameEl(root, 'LH', 'lh'), e2: nameEl(root, 'Estradiol', 'e2'), p4: nameEl(root, 'Progesterone', 'p4'), lin: nameEl(root, 'Womb lining', 'lining'), hcg: nameEl(root, 'hCG', 'hcg') },
   };
   for (const m of S.marks) drawMark(m);
   for (const t of S.ticks) if (t.d === 1 || t.d % 7 === 0) dayLabel(t);
@@ -426,8 +416,10 @@ function draw() {
 
 function paint() {
   const dy = day();
+  const done = S.paused && S.results[S.results.length - 1];
   let num = dy, unit = 'day of this cycle', sub = '', cs = '';
   if (S.phase === 'idle') { num = 1; }
+  else if (done && !done.preg) { num = done.len; unit = 'days in that cycle'; }
   else if (S.phase === 'fired') { num = ONSET; unit = 'hours of estradiol'; sub = `Day ${dy}`; cs = 'fired'; }
   else if (S.phase === 'luteal') { num = Math.floor((S.h - S.ovH) / DAY); unit = 'days since the egg'; sub = `Day ${dy}`; cs = 'luteal'; }
   else if (S.holding) { num = Math.floor(S.held); unit = 'hours of estradiol'; sub = `Day ${dy}`; }
@@ -458,14 +450,15 @@ function paint() {
   n.key.classList.toggle('down', S.pressed);
   n.key.classList.toggle('live', S.holding);
   n.key.classList.toggle('invite', inviting);
-  const keyText = inviting ? 'tap' : 'space';
+  const keyText = touch
+    ? (inviting || (useful && S.phase !== 'ready') ? 'tap' : 'hold')
+    : inviting ? 'tap' : S.phase === 'ready' ? 'hold space' : useful ? 'tap space' : 'space';
   if (n.key.textContent !== keyText) n.key.textContent = keyText;
   n.key.classList.toggle('idle', !useful && !S.pressed);
   n.reset.hidden = S.phase === 'idle';
-  n.speed.textContent = `Speed ${speed}× · [ and ] to change · R to start over`;
-
-  const stepNow = chainStep();
-  [...n.chain.children].forEach((li, i) => { li.className = `${li.dataset.c} ${i === stepNow ? 'now' : i < stepNow ? 'done' : ''}`; });
+  const speedText = `Speed ${speed}× · [ and ] to change · R to start over`, normal = speed === 1;
+  if (n.speed.textContent !== speedText) n.speed.textContent = speedText;
+  if (n.speed.hidden !== normal) n.speed.hidden = normal;
 }
 
 /* ── blood ──────────────────────────────────────────────────────────────── */
@@ -506,7 +499,8 @@ function tick(now) {
   } else {
     if (S.pull > 0) S.pull = reduced ? 0 : Math.max(0, S.pull - dt / 1.1);
     S.r += (rateNow() * speed - S.r) * (1 - Math.exp(-dt / .22));
-    step(S.r * dt, dt);
+    // x is seconds at normal speed, so the speed keys scroll faster without fitting more on screen
+    step(S.r * dt, dt * speed);
   }
   moveDots(dt);
   if (scene) draw();
@@ -546,7 +540,6 @@ function startOver() {
   Object.assign(S, fresh());
   n.future.dataset.mode = '';
   n.ov.dataset.state = 'follicle'; n.ov.dataset.embryo = ''; n.ovName.textContent = 'Follicle';
-  setLastLink(LAST_LINK.text, LAST_LINK.c);
   n.say.classList.remove('swap'); n.say.textContent = LINES.idle;
   build();
   paint();
@@ -570,6 +563,8 @@ addEventListener('blur', release);
 
 n.stage.addEventListener('pointerdown', (e) => {
   if (e.button !== 0 || e.target.closest('button, a')) return;
+  // a finger or pen holds only on the key, so the rest of the stage still scrolls the page
+  if (e.pointerType !== 'mouse' && !e.target.closest('.key')) return;
   try { n.stage.setPointerCapture(e.pointerId); } catch { /* the hold still works without capture */ }
   press();
 });

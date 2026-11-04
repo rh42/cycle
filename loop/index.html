@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>One cycle</title>
+<title>Be a follicle</title>
 <meta name="description" content="Hold the space bar and run a menstrual cycle: estradiol, the LH surge, ovulation, progesterone, and the bleed that follows about two weeks later.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../css/tokens.css?v=2">
 <link rel="stylesheet" href="../css/base.css">
 <link rel="stylesheet" href="../css/molecule.css">
-<link rel="stylesheet" href="loop.css?v=8">
+<link rel="stylesheet" href="loop.css?v=11">
 </head>
 <body>
 <noscript>
   <div style="max-width:62ch;margin:3rem auto;padding:0 1.5rem;font:400 16px/1.65 Georgia,serif">
-    <h1>One cycle</h1>
+    <h1>Be a follicle</h1>
     <p>A follicle makes estradiol, which rebuilds the lining and holds the pituitary back. Held up for about two and a half days, the same hormone flips the pituitary into an LH surge, and the surge releases the egg. The empty follicle then makes progesterone for about two weeks. When progesterone falls, the lining sheds. That is the bleed. If an embryo implants, it makes hCG, which keeps the empty follicle going, so progesterone holds up and there is no bleed.</p>
     <p><em>This page is interactive and needs JavaScript to draw itself. The summary above is the whole idea.</em></p>
   </div>
@@ -24,7 +24,6 @@
 <main>
   <a class="skip" href="#words">Skip the game and read the cycle in words</a>
   <section class="stage" id="stage" aria-labelledby="st-h">
-    <h1 id="st-h" class="sr-only">One cycle</h1>
     <div class="plot" id="plot" aria-hidden="true"></div>
 
     <div class="pit" id="pit" data-state="quiet" aria-hidden="true">
@@ -38,22 +37,19 @@
 
     <div class="future" id="future">
       <div class="slot">
-        <ol class="chain" id="chain">
-          <li data-c="e2">Estradiol rebuilds the lining and brakes LH.</li>
-          <li data-c="lh">Held up long enough, it fires an LH surge.</li>
-          <li data-c="egg-c">The surge releases the egg.</li>
-          <li data-c="p4">The empty follicle makes progesterone.</li>
-          <li data-c="blood">When progesterone falls, the lining sheds.</li>
-        </ol>
+        <header class="stage-mast">
+          <p class="label">Cycle · 02</p>
+          <h1 id="st-h">Be a follicle</h1>
+        </header>
         <div class="bars" id="bars"></div>
       </div>
       <p class="count" id="count-wrap"><span class="count-num" id="count">1</span><span class="label count-unit"><span id="count-unit">day of this cycle</span><span id="count-sub"></span></span></p>
-      <p class="say" id="say" aria-live="polite">This is day 1, the day bleeding starts. Calendars count from here. The story started two weeks ago. Tap space to start the clock.</p>
+      <p class="say" id="say" aria-live="polite">This is day 1, the day bleeding starts. Calendars count from here. The lines are hormones in the blood. Along the bottom is the lining of the womb. The story started two weeks ago.</p>
       <div class="controls">
         <kbd class="key" id="key">space</kbd>
         <button type="button" class="reset" id="reset" hidden>Start over</button>
       </div>
-      <p class="label speed" id="speed"></p>
+      <p class="label speed" id="speed" hidden></p>
     </div>
   </section>
 
@@ -170,7 +166,7 @@
     </footer>
   </div>
 </main>
-<script type="module" src="loop.js?v=13"></script>
+<script type="module" src="loop.js?v=17"></script>
 <script type="module" src="cast.js?v=3"></script>
 </body>
 </html>
