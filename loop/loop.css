@@ -2,11 +2,12 @@
    line, top to bottom in the order the signal travels. Right of it is empty future. */
 .stage {
   --now: 56%;
-  --lining: #B9747B; --blood: #8E1B2C;
+  --lining: #DF5770; --blood: #8E1B2C; --blood-text: var(--blood);
   position: relative; height: 100svh; min-height: 36rem; overflow: hidden;
   user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; cursor: default;
 }
-@media (prefers-color-scheme: dark) { .stage { --lining: #B9747B; --blood: #D0445A; } }
+/* blood stays deep red in both modes; as text on the dark paper it needs a lighter red */
+@media (prefers-color-scheme: dark) { .stage { --lining: #C1789A; --blood-text: #D6303A; } }
 .plot { position: absolute; inset: 0; }
 .plot svg { display: block; width: 100%; height: 100%; }
 
@@ -16,7 +17,7 @@
 .e2 { --c: var(--e2); } .lh { --c: var(--lh); } .p4 { --c: var(--p4); } .lining { --c: var(--lining); } .blood { --c: var(--blood); } .hcg { --c: var(--ink); }
 .plot .area { fill: var(--c); }
 .plot .edge { stroke: var(--c); }
-.plot .dot { fill: var(--c); stroke: none; }
+.plot .dot, .plot .bleed { fill: var(--c); stroke: none; }
 .plot .now { stroke: var(--ink); stroke-width: 1; }
 /* progesterone at zero would otherwise draw a purple line along the floor all month */
 .plot .floor-mask { stroke: var(--paper); stroke-width: 4; }
@@ -63,6 +64,14 @@
 }
 .ov[data-state='empty'] .egg { translate: 0 14rem; opacity: 0; margin-top: .3rem; transition: translate 4s linear, opacity 1.2s ease-in 2.8s; }
 .ov[data-state='spent'] .egg, .ov[data-embryo='true'] .egg { display: none; }
+.you {
+  position: absolute; left: 50%; bottom: calc(100% + .7rem); translate: -50% 0;
+  padding: .2rem .5rem; border-radius: .3rem; background: var(--ink); color: var(--paper);
+  font: var(--f-label); letter-spacing: var(--track-label); text-transform: uppercase;
+  transition: opacity var(--t-scene);
+}
+.you::after { content: ''; position: absolute; left: 50%; top: 100%; translate: -50% 0; border: .3rem solid transparent; border-top-color: var(--ink); }
+.ov[data-you='false'] .you { opacity: 0; }
 .plot .embryo .shell { fill: color-mix(in oklab, var(--ink) 8%, var(--paper)); stroke: var(--ink); stroke-width: 1.5; }
 .plot .embryo .cell { fill: var(--paper); stroke: var(--ink); stroke-width: 1; }
 .plot .embryo-name { text-anchor: start; }
@@ -71,7 +80,8 @@
   position: absolute; left: var(--now); right: 0; top: 0; bottom: 0;
   display: flex; flex-direction: column; padding: 1.75rem clamp(1.5rem, 4vw, 4rem) 1.75rem clamp(5.5rem, 7vw, 7rem);
 }
-.slot { min-height: 8.5rem; }
+/* fits the title plus a four-bar summary, so nothing below moves when the bars appear */
+.slot { min-height: 11.25rem; }
 .stage-mast { margin: 0 0 1.25rem; }
 .stage-mast p { margin: 0; }
 .stage-mast h1 { margin: .35rem 0 0; font: var(--f-chart-title); font-variation-settings: 'SOFT' 100; letter-spacing: -.015em; }
@@ -94,7 +104,7 @@
 .count[data-state='fading'] .count-num { color: var(--ink-3); }
 .count[data-state='fired'] .count-num { color: var(--lh); }
 .count[data-state='luteal'] .count-num { color: var(--p4); }
-.count[data-state='shed'] .count-num { color: var(--blood); }
+.count[data-state='shed'] .count-num { color: var(--blood-text); }
 .say { margin: 1.1rem 0 auto; font: var(--f-lede); max-width: 28rem; min-height: 5.6em; transition: opacity 180ms; }
 .say.swap { opacity: 0; }
 
@@ -112,13 +122,15 @@
 .key.invite { background: var(--ink); color: var(--paper); }
 .key.nope { animation: nope 320ms var(--ease); }
 @keyframes nope { 20% { transform: translateX(-7px); } 45% { transform: translateX(6px); } 70% { transform: translateX(-3px); } }
-.reset {
+.text-btns { display: flex; gap: 1.5rem; }
+.text-btn {
   padding: .35rem 0; background: none; border: 0; cursor: pointer;
   font: var(--f-mono); letter-spacing: var(--track-mono); color: var(--ink-2);
   text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: .18em;
 }
-.reset:hover { color: var(--ink); text-decoration-color: currentColor; }
-.reset[hidden] { display: none; }
+.text-btn:hover { color: var(--ink); text-decoration-color: currentColor; }
+/* hidden buttons keep their space, so the key doesn't jump when they appear */
+.text-btn[hidden] { display: inline-block; visibility: hidden; }
 .speed { margin: .8rem 0 0; }
 /* keeps its line while hidden, so the count and caption don't jump when it appears */
 .speed[hidden] { display: block; visibility: hidden; }
@@ -165,11 +177,13 @@
 .sources li::marker { color: var(--ink-3); }
 .sources a { white-space: nowrap; color: var(--ink); }
 
-/* this version is built for a keyboard and a wide screen */
+/* the game needs room on both axes; below it the page is the words alone */
 .narrow { display: none; }
-@media (max-width: 819px) {
+@media (max-width: 819px), (max-height: 499px) {
   .stage { display: none; }
   .narrow { display: block; margin: 3rem 0 0; font: var(--f-lede); }
+}
+@media (max-width: 819px) {
   .notes article, .cast-big article, .words-grid article { grid-column: 1 / -1; }
   .cast-small .mol, .cast-small .cast-text { grid-column: span 6; }
 }

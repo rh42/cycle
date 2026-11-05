@@ -20,20 +20,21 @@ const PREG_END = 20;        // days from egg when a pregnant run stops
 const BRAKE = .4;
 const SURGE = { amp: 7, center: 16, sd: 9, len: 48 };   // Hoff 1983: ~48 h for a spontaneous surge
 const LINING = { base: .1, grow: .016 };                // drawn, relative to full thickness
+const BLEED = { even: .065, uneven: .3 };               // seconds at normal speed between drops; drawn
 
 // on a touch screen the reader holds the on-screen key, so the copy names it instead of the space bar
 const touch = matchMedia('(hover: none) and (pointer: coarse)').matches;
 const KEY = touch ? 'the key' : 'space';
 
 const LINES = {
-  idle: 'This is day 1, the day bleeding starts. Calendars count from here. The lines are hormones in the blood. Along the bottom is the lining of the womb. The story started two weeks ago.',
-  shed: 'The old lining is leaving. Estradiol and progesterone are low, so the brake is off and the pituitary sends FSH.',
-  grow: 'Follicles in the ovary begin to grow. One pulls ahead and starts making estradiol, which rebuilds the lining.',
+  idle: 'This is day 1, the day bleeding starts. Calendars count from here. The lines are hormones in the blood. The story started two weeks ago.',
+  shed: 'The old lining is leaving. Estradiol and progesterone are low, so nothing holds the pituitary back, and it tells follicles in the ovary to grow.',
+  grow: 'One follicle pulls ahead and starts making estradiol, which rebuilds the lining.',
   early: 'Not yet. This follicle is too small to matter.',
   ready: `Your turn. Hold ${KEY} and this follicle keeps estradiol up.`,
   wait: 'The first half of a cycle can wait. Every day here adds a day to this cycle.',
   rising: 'Estradiol climbs. Keep holding.',
-  braking: 'The pituitary lets out less LH. Estradiol is a brake.',
+  braking: 'The pituitary lets out less LH, the hormone an ovulation test looks for. Estradiol is a brake.',
   steady: 'The level has stopped changing. Keep holding.',
   thirtysix: 'Thirty-six hours. The brake is still on. Tested now, the pituitary barely answers.',
   same: 'Same molecule, same level. Only the time is changing.',
@@ -52,16 +53,16 @@ const LINES = {
   toolate: 'Too late. The egg lasts a day at most.',
   met: 'They meet. The embryo starts dividing and drifts toward the lining.',
   drift: 'The clock is still running. In a few days progesterone will start to fall.',
-  implanted: 'The embryo settles into the lining and starts making hCG.',
+  implanted: 'The embryo settles into the lining and starts making hCG, the hormone a pregnancy test looks for.',
   rescue: 'hCG reaches the empty follicle and tells it to keep going. The clock that was not yours has been overruled.',
   nobleed: 'This is when the bleed was due. Progesterone never fell, so the lining was never told to let go.',
-  climbs: 'hCG keeps climbing, roughly doubling every day or two at first. It is also what a pregnancy test looks for.',
+  climbs: 'hCG keeps climbing, roughly doubling every day or two at first.',
 };
 const MIN_LINE_MS = 2200;
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = (id) => document.getElementById(id);
-const n = { stage: $('stage'), plot: $('plot'), pit: $('pit'), pitState: $('pit-state'), ov: $('ov'), ovName: $('ov-name'), count: $('count'), countWrap: $('count-wrap'), unit: $('count-unit'), sub: $('count-sub'), say: $('say'), key: $('key'), reset: $('reset'), speed: $('speed'), future: $('future'), bars: $('bars') };
+const n = { stage: $('stage'), plot: $('plot'), pit: $('pit'), pitState: $('pit-state'), ov: $('ov'), ovName: $('ov-name'), count: $('count'), countWrap: $('count-wrap'), unit: $('count-unit'), sub: $('count-sub'), say: $('say'), key: $('key'), reset: $('reset'), pause: $('pause'), speed: $('speed'), future: $('future'), bars: $('bars') };
 
 const smooth = (k) => { const v = clamp01(k); return v * v * (3 - 2 * v); };
 const between = (r) => r.min + Math.random() * (r.max - r.min);
@@ -78,9 +79,9 @@ const fresh = () => ({
   pressed: false, holding: false, wasHolding: false, heldFrom: 0,
   luteal: 13, noEgg: Math.round(between(NO_EGG)),
   e2: E2.low, lh: 1, p4: 0, hcg: 0, lin: .35, brake: 0, held: 0, letGoAt: 0, releasedAt: null,
-  onset: null, ovH: null, ovDay: null, offer: false, preg: null, ended: false, shed: { until: DAY * SHED, uneven: false }, summaryAt: null, pull: 0, paused: false,
+  onset: null, ovH: null, ovDay: null, offer: false, preg: null, ended: false, shed: { until: DAY * SHED, uneven: false }, summaryAt: null, pull: 0, paused: false, halted: false,
   hist: [[-24000, E2.low, 1, 0, .35, -1000, 0], [0, E2.low, 1, 0, .35, 0, 0]], lastSample: 0,
-  marks: [], ticks: [], lastDay: 0, dots: [], spawnE2: 0, spawnLH: 0, spawnP4: 0, spawnBlood: 0, spawnHCG: 0, ripple: 0, flip: false,
+  marks: [], ticks: [], lastDay: 0, dots: [], splashes: [], spawnE2: 0, spawnLH: 0, spawnP4: 0, spawnBlood: 0, spawnHCG: 0, ripple: 0, flip: false,
   results: [], cause: 'bleed', line: 'idle', lineSince: -Infinity, nopeUntil: 0, late: false, summary: '', winFrom: 0,
 });
 const S = fresh();
@@ -191,16 +192,18 @@ function pause() {
 
 function summaryLine() {
   const r = S.results[S.results.length - 1];
-  if (r.preg) return `A late period, and this time not a late egg. One signal from the embryo kept the second half going. Press ${KEY} to start over.`;
+  if (r.preg) return `A late period, and this time not a late egg. One signal from the embryo kept the second half going. Tap ${KEY} to start over.`;
   const earlier = S.results.slice(0, -1).filter((x) => x.ov !== null);
   const prev = earlier[earlier.length - 1];
-  if (r.ov === null) return `No egg this cycle, and still a bleed. In women with regular cycles it can come at about the usual time, so a period does not prove ovulation. Press ${KEY}.`;
-  if (!prev) return `Egg on day ${r.ov}, bleed ${r.len + 1 - r.ov} days later. Press ${KEY}. This time wait longer before you hold, and tap once the egg is out.`;
+  // only someone who has never fired the follicle needs telling how
+  const hint = earlier.length ? '' : ` Next time, hold ${KEY} once the follicle is ready.`;
+  if (r.ov === null) return `No egg this cycle, and still a bleed. In women with regular cycles it can come at about the usual time, so a period does not prove ovulation.${hint}`;
+  if (!prev) return `Egg on day ${r.ov}, bleed ${r.len + 1 - r.ov} days later. This time wait longer before you hold, and tap once the egg is out.`;
   const late = r.ov - prev.ov, moved = r.len - prev.len;
   const days = (v) => `${v} day${v === 1 ? '' : 's'}`;
-  if (late >= 2 && moved >= 1) return `Egg ${days(late)} later than last time, and the bleed ${days(moved)} later. A late period mostly means a late egg, already decided about two weeks before anyone noticed. Press ${KEY}.`;
-  if (late <= -2 && moved <= -1) return `Egg ${days(-late)} earlier than last time, and the bleed ${days(-moved)} earlier. The days after the egg barely moved. Press ${KEY}.`;
-  return `Egg on day ${r.ov}, bleed ${r.len + 1 - r.ov} days later. The first half decides most of this. Press ${KEY}, and try waiting longer before you hold.`;
+  if (late >= 2 && moved >= 1) return `Egg ${days(late)} later than last time, and the bleed ${days(moved)} later. A late period mostly means a late egg, already decided about two weeks before anyone noticed.`;
+  if (late <= -2 && moved <= -1) return `Egg ${days(-late)} earlier than last time, and the bleed ${days(-moved)} earlier. The days after the egg barely moved.`;
+  return `Egg on day ${r.ov}, bleed ${r.len + 1 - r.ov} days later. The first half decides most of this. Try waiting longer before you hold.`;
 }
 
 function renderBars() {
@@ -282,7 +285,7 @@ function build() {
   // three floors: LH hangs from the top, ovary hormones stand on the floor line, the lining grows up to it
   const floor = H * .78, unit = H * .075;
   scene = {
-    W, H, nowX, floor, pxs: W * .024,
+    W, H, nowX, floor, pxs: W * .024, ground: H - 3,
     ly: (v) => v * unit, ey: (v) => floor - (v / E2.hold) * H * .36, py: (v) => floor - v * H * .3, hy: (v) => floor - v * H * .62, ny: (v) => H - v * (H - floor - rem(1.75)),
     linArea: svg('path', { class: 'area lining' }, root), linEdge: svg('path', { class: 'edge lining' }, root),
     e2Area: svg('path', { class: 'area e2' }, root), e2Edge: svg('path', { class: 'edge e2' }, root),
@@ -302,6 +305,9 @@ function build() {
   for (const m of S.marks) drawMark(m);
   for (const t of S.ticks) if (t.d === 1 || t.d % 7 === 0) dayLabel(t);
   for (const dt of S.dots) dt.el = null;
+  S.splashes.length = 0;
+  scene.bleed = svg('path', { class: 'bleed blood' }, scene.dotLayer);
+  scene.bleedD = '';
   draw();
 }
 const nameEl = (root, label, kind) => {
@@ -404,10 +410,18 @@ function draw() {
 
   for (const d of S.dots) {
     if (!d.el) continue;
-    if (d.kind === 'blood') { d.el.setAttribute('cx', nowX - d.dx); d.el.setAttribute('cy', lerp(ny(d.top), H + 8, d.p * d.p)); } else {
-      d.el.setAttribute('cx', nowX); d.el.setAttribute('cy', lerp(H * d.y0, H * d.y1, d.p));
-    }
+    d.el.setAttribute('cx', nowX); d.el.setAttribute('cy', lerp(H * d.y0, H * d.y1, d.p));
   }
+  // all blood is one path, one write a frame. Where a drop lands on the floor (just above the bottom
+  // edge) a puddle spreads and flattens away, and droplets hop up, fall back and shrink to nothing.
+  let bleed = '';
+  const ground = scene.ground;
+  for (const d of S.dots) if (d.kind === 'blood') bleed += disc(nowX - d.dx, lerp(ny(d.top), ground, d.p * d.p), d.r);
+  for (const { x, r, t: k } of S.splashes) {
+    bleed += disc(x, ground, r * (.9 + 2.2 * Math.sqrt(k)), r * .5 * (1 - k));
+    for (let i = 0; i < 4; i++) bleed += disc(x + (i - 1.5) * r * 2.2 * k, ground - r * (2.6 + 1.2 * (i % 2)) * 4 * k * (1 - k), r * .42 * (1 - k));
+  }
+  if (bleed !== scene.bleedD) { scene.bleed.setAttribute('d', bleed); scene.bleedD = bleed; }
   if (S.ripple > 0) {
     scene.ripple.setAttribute('r', rem(3.5) + (1 - S.ripple) * scene.W * .35);
     scene.ripple.style.opacity = S.ripple * .8;
@@ -424,7 +438,7 @@ function paint() {
   else if (S.phase === 'luteal') { num = Math.floor((S.h - S.ovH) / DAY); unit = 'days since the egg'; sub = `Day ${dy}`; cs = 'luteal'; }
   else if (S.holding) { num = Math.floor(S.held); unit = 'hours of estradiol'; sub = `Day ${dy}`; }
   else if (S.held > 0) { num = Math.floor(S.letGoAt); unit = 'hours of estradiol'; sub = `Day ${dy}`; cs = 'fading'; }
-  else if (S.shed && S.h < S.shed.until && S.results.length) cs = 'shed';
+  else if (S.shed && S.h < S.shed.until) cs = 'shed';
   if (n.count.textContent !== String(num)) n.count.textContent = num;
   if (n.unit.textContent !== unit) n.unit.textContent = unit;
   if (n.sub.textContent !== sub) n.sub.textContent = sub;
@@ -437,6 +451,9 @@ function paint() {
   if (n.ov.style.getPropertyValue('--k') !== tint) n.ov.style.setProperty('--k', tint);
   const hold = String(S.holding);
   if (n.ov.dataset.hold !== hold) n.ov.dataset.hold = hold;
+  // the tag introduces the reader's character on the opening frame, then gets out of the way
+  const you = String(S.phase === 'idle');
+  if (n.ov.dataset.you !== you) n.ov.dataset.you = you;
 
   const firing = S.onset !== null && S.h - S.onset < SURGE.len;
   const pit = firing ? 'firing' : S.brake > .3 ? 'braking' : 'quiet';
@@ -445,17 +462,20 @@ function paint() {
     n.pitState.textContent = { quiet: 'listening', braking: 'braking', firing: 'firing' }[pit];
   }
 
-  const inviting = S.phase === 'luteal' && S.offer && !S.preg && (S.h - S.ovH) / DAY < 1;
-  const useful = S.paused || S.phase === 'idle' || S.phase === 'ready' || inviting;
+  const inviting = !S.halted && S.phase === 'luteal' && S.offer && !S.preg && (S.h - S.ovH) / DAY < 1;
+  const useful = S.halted || S.paused || S.phase === 'idle' || S.phase === 'ready' || inviting;
   n.key.classList.toggle('down', S.pressed);
   n.key.classList.toggle('live', S.holding);
   n.key.classList.toggle('invite', inviting);
   const keyText = touch
-    ? (inviting || (useful && S.phase !== 'ready') ? 'tap' : 'hold')
-    : inviting ? 'tap' : S.phase === 'ready' ? 'hold space' : useful ? 'tap space' : 'space';
+    ? (S.halted || inviting || (useful && S.phase !== 'ready') ? 'tap' : 'hold')
+    : S.halted ? 'tap space' : inviting ? 'tap' : S.phase === 'ready' ? 'hold space' : useful ? 'tap space' : 'space';
   if (n.key.textContent !== keyText) n.key.textContent = keyText;
   n.key.classList.toggle('idle', !useful && !S.pressed);
   n.reset.hidden = S.phase === 'idle';
+  const noPause = S.phase === 'idle' || S.paused, pauseText = S.halted ? 'Resume' : 'Pause';
+  if (n.pause.hidden !== noPause) n.pause.hidden = noPause;
+  if (n.pause.textContent !== pauseText) n.pause.textContent = pauseText;
   const speedText = `Speed ${speed}× · [ and ] to change · R to start over`, normal = speed === 1;
   if (n.speed.textContent !== speedText) n.speed.textContent = speedText;
   if (n.speed.hidden !== normal) n.speed.hidden = normal;
@@ -463,11 +483,21 @@ function paint() {
 
 /* ── blood ──────────────────────────────────────────────────────────────── */
 
+// a filled ellipse as path data, so any number of them can share one element
+const disc = (x, y, rx, ry = rx) => {
+  if (rx < .3 || ry < .3) return '';
+  const a = rx.toFixed(1), b = ry.toFixed(1), w = (2 * rx).toFixed(1);
+  return `M${(x - rx).toFixed(1)} ${y.toFixed(1)}a${a} ${b} 0 1 0 ${w} 0a${a} ${b} 0 1 0 -${w} 0z`;
+};
 function spawn(kind, y0, y1, extra = {}) {
   if (reduced || S.dots.length > 70 || !scene) return;
-  const r = kind === 'blood' ? 3 + Math.random() * 3 : 4;
-  S.dots.push({ kind, y0, y1, p: 0, el: svg('circle', { class: `dot ${kind}`, r }, scene.dotLayer), ...extra });
+  const blood = kind === 'blood', r = blood ? 3 + Math.random() * 3 : 4;
+  S.dots.push({ kind, y0, y1, r, p: 0, el: blood ? null : svg('circle', { class: `dot ${kind}`, r }, scene.dotLayer), ...extra });
 }
+function splash(x, r) {
+  if (!reduced && S.splashes.length < 24) S.splashes.push({ x, r, t: 0 });
+}
+// dt here is seconds at normal speed, so a bleed drops the same blood at any speed
 function moveDots(dt) {
   // along the now line: pituitary .1, ovary .52, lining .82
   S.spawnE2 += dt; S.spawnLH += dt; S.spawnP4 += dt; S.spawnBlood += dt; S.spawnHCG += dt;
@@ -477,14 +507,24 @@ function moveDots(dt) {
   if (live && S.p4 > .2 && S.spawnP4 > .34) { S.spawnP4 = 0; spawn('p4', .58, .82); }
   if (live && S.hcg > 0 && S.spawnHCG > .3) { S.spawnHCG = 0; spawn('hcg', .84, .58); }
   const shedding = live && S.shed && S.h < S.shed.until && S.phase !== 'idle';
-  if (shedding && S.spawnBlood > (S.shed.uneven ? .26 : .05)) {
-    S.spawnBlood = 0;
+  // blood keeps the remainder between drops, so its rate does not snap to the display's frame rate
+  if (!shedding) S.spawnBlood = 0;
+  const every = S.shed.uneven ? BLEED.uneven : BLEED.even;
+  while (shedding && S.spawnBlood >= every) {
+    S.spawnBlood -= every;
     spawn('blood', 0, 0, { dx: 6 + Math.random() * scene.nowX * .22, top: S.lin * Math.random(), speed: .9 + Math.random() * .6 });
   }
   for (let i = S.dots.length - 1; i >= 0; i--) {
     const d = S.dots[i];
     d.p += dt / (d.kind === 'blood' ? d.speed : 1.3);
-    if (d.p >= 1) { d.el?.remove(); S.dots.splice(i, 1); }
+    if (d.p >= 1) {
+      if (d.kind === 'blood' && scene) splash(scene.nowX - d.dx, d.r);
+      d.el?.remove(); S.dots.splice(i, 1);
+    }
+  }
+  for (let i = S.splashes.length - 1; i >= 0; i--) {
+    S.splashes[i].t += dt / .5;
+    if (S.splashes[i].t >= 1) S.splashes.splice(i, 1);
   }
   if (S.ripple > 0) S.ripple = Math.max(0, S.ripple - dt / 1.6);
 }
@@ -493,20 +533,23 @@ function moveDots(dt) {
 
 let last = 0, raf = 0;
 function tick(now) {
+  if (S.halted) { S.running = false; return; }
   const dt = Math.min(.6, (now - last) / 1000); last = now;
   if (S.paused) {
     S.pull = reduced ? 1 : Math.min(1, S.pull + dt / 1.6);
   } else {
     if (S.pull > 0) S.pull = reduced ? 0 : Math.max(0, S.pull - dt / 1.1);
-    S.r += (rateNow() * speed - S.r) * (1 - Math.exp(-dt / .22));
-    // x is seconds at normal speed, so the speed keys scroll faster without fitting more on screen
-    step(S.r * dt, dt * speed);
+    // speed is a pure fast-forward: everything, the rate easing included, runs in seconds at normal
+    // speed (T), so x never fits more on screen and a bleed drops the same blood at any speed
+    const t = dt * speed;
+    S.r += (rateNow() - S.r) * (1 - Math.exp(-t / .22));
+    step(S.r * t, t);
   }
-  moveDots(dt);
+  moveDots(dt * speed);
   if (scene) draw();
   paint();
   say(now);
-  if (S.paused && S.pull >= 1 && !S.dots.length) { S.running = false; return; }
+  if (S.paused && S.pull >= 1 && !S.dots.length && !S.splashes.length) { S.running = false; return; }
   raf = requestAnimationFrame(tick);
 }
 function run() {
@@ -518,8 +561,17 @@ function run() {
 
 /* ── hands ──────────────────────────────────────────────────────────────── */
 
+// the reader's own pause, separate from the summary pause: everything freezes where it is
+function halt(on) {
+  if (S.phase === 'idle' || S.paused) return;
+  S.halted = on;
+  if (!on) run();
+  paint();
+}
+
 function press() {
   S.pressed = true;
+  if (S.halted) { halt(false); return; }
   if (S.phase === 'idle') { S.phase = 'grow'; S.shed = { until: S.h + SHED * DAY, uneven: false }; run(); return; }
   if (S.paused && S.ended) { startOver(); return; }
   if (S.paused) { S.paused = false; n.future.dataset.mode = ''; run(); return; }
@@ -545,9 +597,10 @@ function startOver() {
   paint();
 }
 
-// space scrolls the page unless the stage is the thing on screen
-const onStage = () => scrollY < innerHeight / 2;
+// space scrolls the page unless the stage is the thing on screen; a hidden stage never takes it
+const onStage = () => n.stage.offsetHeight > 0 && scrollY < innerHeight / 2;
 addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { halt(!S.halted); return; }
   if (e.key === '[' || e.key === ']') {
     speed = Math.max(.25, Math.min(4, speed + (e.key === ']' ? .25 : -.25)));
     paint();
@@ -573,6 +626,7 @@ n.stage.addEventListener('contextmenu', (e) => e.preventDefault());
 
 // without the blur, the next space would press this button instead of the follicle
 n.reset.addEventListener('click', () => { startOver(); n.reset.blur(); });
+n.pause.addEventListener('click', () => { halt(!S.halted); n.pause.blur(); });
 
 build();
 paint();

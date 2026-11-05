@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="../css/tokens.css?v=2">
 <link rel="stylesheet" href="../css/base.css">
 <link rel="stylesheet" href="../css/molecule.css">
-<link rel="stylesheet" href="loop.css?v=11">
+<link rel="stylesheet" href="loop.css?v=18">
 </head>
 <body>
 <noscript>
@@ -30,7 +30,8 @@
       <span class="organ-name">Pituitary</span>
       <span class="organ-state" id="pit-state">listening</span>
     </div>
-    <div class="ov" id="ov" data-state="follicle" aria-hidden="true">
+    <div class="ov" id="ov" data-state="follicle" data-you="true" aria-hidden="true">
+      <span class="you">You</span>
       <span class="organ-name" id="ov-name">Follicle</span>
       <span class="egg"></span>
     </div>
@@ -40,28 +41,32 @@
         <header class="stage-mast">
           <p class="label">Cycle · 02</p>
           <h1 id="st-h">Be a follicle</h1>
+          <p class="sr-only">The game here is visual. The same story is told in words below.</p>
         </header>
-        <div class="bars" id="bars"></div>
+        <div class="bars" id="bars" aria-hidden="true"></div>
       </div>
-      <p class="count" id="count-wrap"><span class="count-num" id="count">1</span><span class="label count-unit"><span id="count-unit">day of this cycle</span><span id="count-sub"></span></span></p>
-      <p class="say" id="say" aria-live="polite">This is day 1, the day bleeding starts. Calendars count from here. The lines are hormones in the blood. Along the bottom is the lining of the womb. The story started two weeks ago.</p>
+      <p class="count" id="count-wrap" aria-hidden="true"><span class="count-num" id="count">1</span><span class="label count-unit"><span id="count-unit">day of this cycle</span><span id="count-sub"></span></span></p>
+      <p class="say" id="say" aria-hidden="true">This is day 1, the day bleeding starts. Calendars count from here. The lines are hormones in the blood. The story started two weeks ago.</p>
       <div class="controls">
-        <kbd class="key" id="key">space</kbd>
-        <button type="button" class="reset" id="reset" hidden>Start over</button>
+        <kbd class="key" id="key" aria-hidden="true">space</kbd>
+        <span class="text-btns">
+          <button type="button" class="text-btn" id="pause" hidden>Pause</button>
+          <button type="button" class="text-btn" id="reset" hidden>Start over</button>
+        </span>
       </div>
-      <p class="label speed" id="speed" hidden></p>
+      <p class="label speed" id="speed" aria-hidden="true" hidden></p>
     </div>
   </section>
 
   <div class="page">
-    <p class="narrow">This version is built for a keyboard and a wide screen. Open it on a laptop to hold the space bar.</p>
+    <p class="narrow">The game needs a bigger screen. The same story is told in words below.</p>
     <section class="words" id="words" aria-labelledby="words-h">
       <div class="tab"><h2 id="words-h" class="label">The cycle in words</h2></div>
-      <p class="cast-lede">This is the same story the game tells, for anyone using a screen reader or a phone. If you play with a screen reader, the captions are announced as they change.</p>
+      <p class="cast-lede">This is the same story the game tells, for anyone using a screen reader or a phone.</p>
       <div class="words-grid grid">
         <article>
           <h3>The first half</h3>
-          <p>Day 1 is the day bleeding starts, and calendars count from there. The old lining leaves over about four days. Estradiol and progesterone are low, so the pituitary, a gland at the base of the brain, sends out FSH. Follicles in the ovary start to grow, and one pulls ahead.</p>
+          <p>Day 1 is the day bleeding starts, and calendars count from there. The old lining of the womb leaves over about four days. Estradiol and progesterone are low, so the pituitary, a gland at the base of the brain, sends out FSH. Follicles in the ovary start to grow, and one pulls ahead.</p>
           <p>That follicle makes estradiol, which rebuilds the lining and holds the pituitary's LH back. Kept up for about two and a half days, the same estradiol flips it into a surge. Roughly a day and a half after the surge begins, the follicle opens and the egg comes out. That is ovulation.</p>
           <p>This half can stretch. On average it runs from about 10 days in very short cycles to about 27 in long ones.</p>
         </article>
@@ -107,7 +112,8 @@
       </div>
     </section>
 
-    <section class="notes grid" aria-label="What the cycle shows">
+    <section class="notes grid" aria-labelledby="notes-h">
+      <h2 id="notes-h" class="sr-only">What the cycle shows</h2>
       <article class="tab">
         <h3>The fall is the signal</h3>
         <p>After an egg, a period is caused mainly by progesterone falling. Estrogen falls too, but that is not the cause. Block progesterone's receptor in the second half of the cycle and bleeding starts within days, even while progesterone is still high in the blood.</p>
@@ -126,7 +132,7 @@
       </article>
       <article class="tab">
         <h3>Time, as well as level</h3>
-        <p>In 1975 Keye and Jaffe gave women estradiol injections that kept blood levels similar and varied only how long, then tested the pituitary with a dose of GnRH. At 36 hours its LH response had all but vanished. At 60 it was bigger than usual. Two women at each time point, ten in all across the study. No surge came on its own in this experiment, even at 132 hours. Liu and Yen got one at about 58 hours, with estradiol rising in steps. The game combines the two: it holds estradiol flat and fires at 60.</p>
+        <p>In 1975 Keye and Jaffe gave women estradiol injections that kept blood levels similar and varied only how long, then tested the pituitary with a dose of GnRH, the brain's signal to the pituitary. At 36 hours its LH response had all but vanished. At 60 it was bigger than usual. Two women at each time point, ten in all across the study. No surge came on its own in this experiment, even at 132 hours. Liu and Yen got one at about 58 hours, with estradiol rising in steps. The game combines the two: it holds estradiol flat and fires at 60.</p>
       </article>
     </section>
 
@@ -166,7 +172,7 @@
     </footer>
   </div>
 </main>
-<script type="module" src="loop.js?v=17"></script>
+<script type="module" src="loop.js?v=28"></script>
 <script type="module" src="cast.js?v=3"></script>
 </body>
 </html>
